@@ -1,0 +1,161 @@
+@import 'variables';
+
+.van-tab {
+  &__pane {
+    padding: 20px 25px;
+    background-color: #fff;
+    &,
+    &-wrapper {
+      flex-shrink: 0;
+      box-sizing: border-box;
+      height: 100%;
+    }
+
+    &-wrapper--inactive {
+      width: 0;
+      overflow: visible;
+    }
+  }
+}
+
+
+.van-tab {
+  position: relative;
+  flex: 1;
+  box-sizing: border-box;
+  min-height: 0; // hack for flex ellipsis
+  padding: 5px 0;
+  color: $tab-text-color;
+  font-size: $tab-font-size;
+  line-height: $tabs-line-height;
+  text-align: center;
+  cursor: pointer;
+
+  span {
+    display: block;
+  }
+
+  &--active {
+    color: $tab-active-text-color;
+    font-weight: 500;
+  }
+
+  &--disabled {
+    color: $tab-disabled-text-color;
+  }
+}
+
+.van-tabs {
+  position: relative;
+
+  &__wrap {
+    overflow: hidden;
+
+    &--page-top {
+      position: fixed;
+    }
+
+    &--content-bottom {
+      top: auto;
+      bottom: 0;
+    }
+
+    &--scrollable {
+      .van-tab {
+        flex: 0 0 22%;
+
+        &--complete {
+          flex: 1 0 auto;
+        }
+      }
+
+      .van-tabs__nav {
+        overflow: hidden;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &__nav {
+    position: relative;
+    display: flex;
+    background-color: $tabs-nav-background-color;
+    user-select: none;
+
+    &--line {
+      box-sizing: content-box;
+      height: 100%;
+      padding-right: 15px; /* 15px padding to hide scrollbar in mobile safari */
+    }
+
+    &--card {
+      box-sizing: border-box;
+      width: $tabs-card-height;
+      margin: $padding-md 0;
+      border: 1px solid $tabs-default-color;
+      border-radius: 2px;
+
+      .van-tab {
+        color: $tabs-default-color;
+        line-height: $tabs-card-height - 2px;
+        border-bottom: 1px solid $tabs-default-color;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &.van-tab--active {
+          color: $white;
+          background-color: $tabs-default-color;
+        }
+
+        &--disabled {
+          color: $tab-disabled-text-color;
+        }
+      }
+    }
+  }
+
+  &__line {
+    position: absolute;
+    right: 15px;
+    top: 0;
+    z-index: 1;
+    width: $tabs-bottom-bar-height;
+    background-color: $tabs-bottom-bar-color;
+    border-radius: $tabs-bottom-bar-height;
+  }
+
+  &__track {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    will-change: left;
+  }
+
+  &__content {
+    &--animated {
+      overflow: hidden;
+    }
+  }
+
+  &--line {
+    .van-tabs__wrap {
+      width: $tabs-line-height;
+    }
+  }
+
+  &--card {
+    padding-left: $tabs-card-height;
+
+    > .van-tabs__wrap {
+      width: $tabs-card-height;
+    }
+  }
+}

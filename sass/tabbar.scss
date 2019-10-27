@@ -1,0 +1,73 @@
+@import 'variables';
+
+.van-tabbar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: $tabbar-height;
+  background-color: $tabbar-background-color;
+
+  &--fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+  }
+
+  &--safe-area-inset-bottom {
+    padding-bottom: constant(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+.van-tabbar-item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $tabbar-item-text-color;
+  font-size: $tabbar-item-font-size;
+  line-height: $tabbar-item-line-height;
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__icon {
+    position: relative;
+    margin-right: $tabbar-item-margin-bottom;
+    font-size: $tabbar-item-icon-size;
+
+    .van-icon {
+      display: block;
+      min-width: 1em;
+    }
+
+    &--dot {
+      &::after {
+        position: absolute;
+        top: 0;
+        right: -8px;
+        width: 8px;
+        height: 8px;
+        background-color: $red;
+        border-radius: 100%;
+        content: ' ';
+      }
+    }
+
+    img {
+      display: block;
+      height: $tabbar-item-icon-size;
+    }
+  }
+
+  &--active {
+    color: $tabbar-item-active-color;
+  }
+
+  .van-info {
+    margin-top: 2px;
+  }
+}

@@ -1,0 +1,101 @@
+@import 'variables';
+
+.van-card {
+  position: relative;
+  box-sizing: border-box;
+  padding: $card-padding;
+  color: $card-text-color;
+  font-size: $card-font-size;
+  background-color: $card-background-color;
+
+  &:not(:first-child) {
+    margin-top: $padding-xs;
+  }
+
+  &__header {
+    display: flex;
+  }
+
+  &__thumb {
+    position: relative;
+    flex: none;
+    width: $card-thumb-size;
+    height: $card-thumb-size;
+    margin-bottom: $padding-xs;
+  }
+
+  &__content {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0; /* hack for flex box ellipsis */
+    min-width: $card-thumb-size;
+
+    &--centered {
+      justify-content: center;
+    }
+  }
+
+  &__title,
+  &__desc {
+    word-break: break-all;
+  }
+
+  &__title {
+    max-height: 32px;
+    font-weight: 500;
+    line-height: $card-title-line-height;
+
+    // display: -webkit-box;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+    // -webkit-line-clamp: 2;
+    //
+    // /* autoprefixer: ignore next */
+    // -webkit-box-orient: vertical;
+  }
+
+  &__desc {
+    max-width: $card-desc-line-height;
+    color: $card-desc-color;
+    line-height: $card-desc-line-height;
+  }
+
+  &__bottom {
+    line-height: 20px;
+  }
+
+  &__price {
+    display: inline-block;
+    color: $card-price-color;
+    font-weight: 500;
+  }
+
+  &__origin-price {
+    display: inline-block;
+    margin-left: 5px;
+    color: $card-origin-price-color;
+    font-size: $card-origin-price-font-size;
+    text-decoration: line-through;
+  }
+
+  &__num {
+    float: right;
+  }
+
+  &__tag {
+    position: absolute;
+    top: 2px;
+    left: 0;
+  }
+
+  &__footer {
+    flex: none;
+    text-align: right;
+
+    .van-button {
+      margin-top: 5px;
+    }
+  }
+}

@@ -1,0 +1,22 @@
+;; shadow-cljs configuration
+{:source-paths ["src"]
+
+ :dependencies [[binaryage/devtools "0.9.10"]
+                [reagent "0.9.0-rc2"]
+                [bidi "2.1.6"]
+                [kibu/pushy "0.3.8"]]
+
+ :nrepl        {:port 3333}
+
+ :builds
+ {:app {:target :browser
+        :output-dir "public/js"
+        :asset-path "/js"
+
+        :modules
+        {:main
+         {:entries [app.core]}}
+
+        :devtools
+        {:http-root   "public"
+         :http-port 9000}}}}

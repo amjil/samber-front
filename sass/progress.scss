@@ -1,0 +1,38 @@
+@import 'variables';
+
+.van-progress {
+  position: relative;
+  width: $progress-height;
+  background: $progress-background-color;
+  border-radius: $progress-height;
+
+  &__portion {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border-radius: inherit;
+
+    &--with-pivot {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+
+  &__pivot {
+    position: absolute;
+    right: 50%;
+    bottom: 0;
+    box-sizing: border-box;
+    min-height: 2em;
+    padding: $progress-pivot-padding;
+    font-size: $progress-pivot-font-size;
+    line-height: $progress-pivot-line-height;
+    text-align: center;
+    word-break: keep-all;
+    background-color: $progress-pivot-background-color;
+    border-radius: 1em;
+    // transform: translate(100%, -50%);
+
+    transform: translate(50%, 100%);
+  }
+}

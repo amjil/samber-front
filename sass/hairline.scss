@@ -1,0 +1,43 @@
+[class*='van-hairline'] {
+  position: relative;
+
+  &::after {
+    position: absolute;
+    box-sizing: border-box;
+    content: ' ';
+    pointer-events: none;
+
+    top: -50%;
+    right: -50%;
+    bottom: -50%;
+    left: -50%;
+    border: 0 solid #ebedf0;
+    transform: scale(0.5);
+  }
+}
+
+.van-hairline {
+  &--top::after {
+    border-left-width: 1px;
+  }
+
+  &--left::after {
+    border-top-width: 1px;
+  }
+
+  &--right::after {
+    border-right-width: 1px;
+  }
+
+  &--bottom::after {
+    border-bottom-width: 1px;
+  }
+
+  &--top-bottom::after {
+    border-width: 0 1px 0 1px;
+  }
+
+  &--surround::after {
+    border-width: 1px;
+  }
+}

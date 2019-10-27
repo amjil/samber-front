@@ -1,0 +1,58 @@
+@import 'variables';
+
+.van-skeleton {
+  display: flex;
+  padding: $padding-md 0;
+
+  &:not(:first-child) {
+    margin-left: 1.5rem;
+  }
+
+  &__avatar {
+    flex-shrink: 0;
+    margin-bottom: $padding-md;
+    background-color: $skeleton-avatar-background-color;
+
+    &--round {
+      border-radius: 100%;
+    }
+  }
+
+  &__content {
+    height: 100%;
+  }
+
+  &__avatar + &__content {
+    padding-left: $padding-xs;
+  }
+
+  &__row,
+  &__title {
+    width: $skeleton-row-height;
+    background-color: $skeleton-row-background-color;
+  }
+
+  &__title {
+    margin: 0;
+  }
+
+  &__row {
+    &:not(:first-child) {
+      margin-left: $skeleton-row-margin-top;
+    }
+  }
+
+  &__title + &__row {
+    margin-left: 20px;
+  }
+
+  &--animate {
+    animation: van-skeleton-blink $skeleton-animation-duration ease-in-out infinite;
+  }
+}
+
+@keyframes van-skeleton-blink {
+  50% {
+    opacity: .6;
+  }
+}
