@@ -69,7 +69,7 @@
                  (aget (.-children (r/dom-node component)) 1)
                  #js {:modules #js {:toolbar (aget (.-children (r/dom-node component)) 0)}
                       :theme "snow"
-                      :placeholder "Compose an epic..."}))
+                      :placeholder "11Compose an epic..."}))
 
         (.on @this "text-change"
              (fn [delta old-delta source]
@@ -103,8 +103,10 @@
          [quill-toolbar id]
          [:div {:id (str "quill-editor-" id)
                 :class "quill-editor"
+                ; :on-focus #(.blur js/document.activeElement)
                 :style {:overflow-y "auto"
-                        :width "100%"}
+                        :width "100%"
+                        :ime-mode "disabled"}
                 :dangerouslySetInnerHTML {:__html content}}]])})))
 
 
