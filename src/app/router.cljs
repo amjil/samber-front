@@ -5,27 +5,8 @@
             [app.state :refer [app-state]]))
 
 (def app-routes
-  ["/" {"home" :home
-        "action-sheet" :action-sheet
-        "button" :button
-        "card" :card
-        "cell" :cell
-        "checkbox" :checkbox
-        "collapse" :collapse
-        "dialog" :dialog
-        "divider" :divider
-        "dropdown" :dropdown
-        ; "overlay" :overlay
-        "panel" :panel
-        "picker" :picker
-        "popup" :popup
-        "progress" :progress
-        "radio" :radio
-        "skeleton" :skeleton
-        "swipe-cell" :swipe-cell
-        "tab" :tab
-        "tabbar" :tabbar
-        "tag" :tag
+  ["/" {"home"  :home
+        "tag"   :tag
         "toast" :toast}])
 
 (defn set-page! [match]
