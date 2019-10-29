@@ -26,7 +26,8 @@
     (let [set-page (assoc db :active-page page)]
       (case page
         (:login :settings :home :result
-         :description :form)
+         :description :form
+         :edit)
 
         {:db set-page}
 

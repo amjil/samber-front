@@ -1,6 +1,5 @@
 (ns app.components.tabbar
-  (:require [app.state :refer [app-state]]
-            [reagent.core :as r]))
+  (:require [reagent.core :as r]))
 
 (defn view []
   (let [data [{:id 1 :name "" :icon "home-o" :on-click #(js/console.log "item 1")}

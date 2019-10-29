@@ -6,8 +6,9 @@
 
 (def app-routes
   ["/" {"home"  :home
-        "tag"   :tag
-        "toast" :toast}])
+        "edit"  :edit
+        "toast" :toast
+        "login" :login}])
 
 (defn set-page! [match]
   (swap! app-state assoc :page match))

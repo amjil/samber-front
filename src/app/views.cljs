@@ -5,12 +5,14 @@
             [re-frame.core :refer [subscribe dispatch]]
             [app.components.quill :as quill]
             [app.components.tabbar :as tabbar]
-            [app.components.home :as home]))
+            [app.components.home :as home]
+            [app.components.login :as login]))
 
 (defn pages [page-name]
   (case page-name
     :home             [home/index]
-    :quill            [quill/editor
+    :login            [login/index]
+    :edit            [quill/editor
                        {:id "my-quill-editor-component-id"
                         :content "welcome to reagent-quill!"
                         :selection nil
