@@ -19,6 +19,7 @@
 ; (rf-utils/reg-set-event :active-page)
 (rf-utils/reg-set-event :loading)
 (rf-utils/reg-set-event :paginate)
+(rf-utils/reg-set-event :quill)
 
 (rf/reg-event-fx
   :set-active-page

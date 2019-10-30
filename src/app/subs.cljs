@@ -9,8 +9,8 @@
 
 (rf-utils/reg-basic-sub :active-page)
 (rf-utils/reg-basic-sub :loading)
-(rf-utils/reg-basic-sub :paginate)
-(rf-utils/reg-basic-sub :drawer)
+(rf-utils/reg-basic-sub :quill)
+
 
 (re-frame/reg-sub
   :token

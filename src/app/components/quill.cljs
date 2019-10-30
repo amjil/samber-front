@@ -1,7 +1,8 @@
 (ns app.components.quill
   (:require
    [reagent.core :as r]
-   ["quill" :as quill]))
+   ["quill" :as quill]
+   [re-frame.core :refer [subscribe dispatch]]))
 
 
 (defn quill-toolbar [id]
@@ -77,7 +78,9 @@
 
         (if (= selection nil)
           (.setSelection @this nil)
-          (.setSelection @this (first selection) (second selection) "api")))
+          (.setSelection @this (first selection) (second selection) "api"))
+
+        (dispatch [:set-quill @this]))
 
       :component-will-receive-props
       (fn [component next-props]
@@ -103,7 +106,11 @@
          [quill-toolbar id]
          [:div {:id (str "quill-editor-" id)
                 :class "quill-editor"
-                ; :on-focus #(.blur js/document.activeElement)
+                :on-focus (fn [x]
+                            (let [quill @(subscribe [:quill])]
+                              (js/console.log "xxxxxxx")
+                              (js/console.log (.getSelection quill))))
+                            ; (.blur js/document.activeElement))
                 :style {:overflow-y "auto"
                         :width "100%"
                         :ime-mode "disabled"}
