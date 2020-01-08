@@ -24,7 +24,7 @@
   (fn []
     (let [active-page @(subscribe [:active-page])]
       [:div {:style {:display "flex" :flex-direction "row"}}
-       [:div {:style {:height "calc(100vh - 50px)"
+       [:div {:style {:height "calc(100vh - 40px)"
                       :overflow "hidden"
                       :width "100vw"}}
         [pages active-page]]
