@@ -1,8 +1,9 @@
 @import 'variables';
 
 .van-nav-bar {
+  writing-mode: horizontal-tb;
   position: relative;
-  width: $nav-bar-height;
+  height: $nav-bar-height;
   line-height: $nav-bar-height;
   text-align: center;
   background-color: $nav-bar-background-color;
@@ -31,6 +32,7 @@
   }
 
   &__title {
+    writing-mode: horizontal-tb;
     max-width: 60%;
     margin: 0 auto;
     color: $nav-bar-title-text-color;
@@ -41,12 +43,12 @@
   &__left,
   &__right {
     position: absolute;
-    top: 0;
+    bottom: 0;
     font-size: $font-size-md;
   }
 
   &__left {
-    top: $padding-md;
+    left: $padding-md;
   }
 
   &__right {

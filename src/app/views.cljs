@@ -6,7 +6,8 @@
             [app.components.quill :as quill]
             [app.components.tabbar :as tabbar]
             [app.components.home :as home]
-            [app.components.login :as login]))
+            [app.components.login :as login]
+            [app.components.navbar :as navbar]))
 
 (defn pages [page-name]
   (case page-name
@@ -24,6 +25,8 @@
   (fn []
     (let [active-page @(subscribe [:active-page])]
       [:div {:style {:display "flex" :flex-direction "row"}}
+       [navbar/index]
+
        [:div {:style {:height "calc(100vh - 40px)"
                       :overflow "hidden"
                       :width "100vw"}}
