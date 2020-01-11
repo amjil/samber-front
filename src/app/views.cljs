@@ -27,7 +27,9 @@
       [:div {:style {:display "flex" :flex-direction "row"}}
        [navbar/index]
 
-       [:div {:style {:height "calc(100vh - 40px)"
+       [:div {:style {;:height "calc(100vh - 86px)"
+                      :height "100%"
+                      :margin "46px 0 40px 0"
                       :overflow "hidden"
                       :width "100vw"}}
         [pages active-page]]
