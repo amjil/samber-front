@@ -7,6 +7,7 @@
 (defn index []
   (fn []
     [:div.van-cell-group
+     {:style {:border "thin dotted #FF0000"}}
      [:div.van-cell.van-cell--clickable
       [:div.van-cell__title
        [:div.van-cell__label
