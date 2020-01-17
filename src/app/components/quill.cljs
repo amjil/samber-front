@@ -65,11 +65,11 @@
      {:component-did-mount
       (fn [component]
         (reset! this
-                ; (js/Quill.)
                 (quill.
                  (aget (.-children (r/dom-node component)) 1)
                  #js {:modules #js {:toolbar (aget (.-children (r/dom-node component)) 0)}
                       :theme "snow"
+                      :readOnly true
                       :placeholder "11Compose an epic..."}))
 
         (.on @this "text-change"
@@ -106,11 +106,10 @@
          [quill-toolbar id]
          [:div {:id (str "quill-editor-" id)
                 :class "quill-editor"
-                :on-focus (fn [x]
+                :on-click (fn [x]
                             (let [quill @(subscribe [:quill])]
                               (js/console.log "xxxxxxx")
                               (js/console.log (.getSelection quill))))
-                            ; (.blur js/document.activeElement))
                 :style {:overflow-y "auto"
                         :width "100%"
                         :ime-mode "disabled"}

@@ -4,34 +4,25 @@
             [app.router :as router]
             [re-frame.core :refer [subscribe dispatch]]
             [app.components.quill :as quill]
-            [app.components.tabbar :as tabbar]
             [app.components.home :as home]
             [app.components.login :as login]
-            [app.components.navbar :as navbar]))
+            [app.components.editor :as editor]))
 
 (defn pages [page-name]
   (case page-name
     :home             [home/index]
     :login            [login/index]
-    :edit            [quill/editor
+    :quill            [quill/editor
                        {:id "my-quill-editor-component-id"
                         :content "welcome to reagent-quill!"
                         :selection nil
                         :on-change-fn #(if (= % "user")
                                          (println (str "text changed: " %2)))}]
+    :editor           [editor/index]
     [home/index]))
 
 (defn app []
   (fn []
     (let [active-page @(subscribe [:active-page])]
-      [:div {:style {:display "flex" :flex-direction "row"}}
-       [navbar/index]
-
-       [:div {:style {;:height "calc(100vh - 86px)"
-                      :height "100%"
-                      :margin "46px 0 40px 0"
-                      :overflow "hidden"
-                      :width "100vw"}}
-        [pages active-page]]
-
-       [tabbar/view]])))
+      (js/console.log "active-page = " active-page)
+      [pages active-page])))

@@ -28,7 +28,8 @@
       (case page
         (:login :settings :home :result
          :description :form
-         :edit)
+         :editor
+         :quill)
 
         {:db set-page}
 
