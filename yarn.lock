@@ -661,6 +661,11 @@ querystring@0.2.0:
   resolved "http://registry.npm.taobao.org/querystring/download/querystring-0.2.0.tgz#b209849203bb25df820da756e747005878521620"
   integrity sha1-sgmEkgO7Jd+CDadW50cAWHhSFiA=
 
+quill-delta-to-html@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.npm.taobao.org/quill-delta-to-html/download/quill-delta-to-html-0.11.0.tgz#d980c287752fd641322ba8cbeb11ebd929d62ea7"
+  integrity sha1-2YDCh3Uv1kEyK6jL6xHr2SnWLqc=
+
 quill-delta@^3.6.2:
   version "3.6.3"
   resolved "https://registry.npm.taobao.org/quill-delta/download/quill-delta-3.6.3.tgz#b19fd2b89412301c60e1ff213d8d860eac0f1032"
