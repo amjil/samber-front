@@ -97,12 +97,15 @@
   (let [caret-div (js/document.getElementById "caret-position-div")
         div (if caret-div caret-div (js/document.createElement "div"))]
     (when-not caret-div
-      (set! (.-id div) "caret-position-div")
-      (doseq [[k v] {"position" "absolute"
-                     "background-color" "red"
-                     "width" "18px"
-                     "height" "1px"}]
-        (aset (.-style div) k v)))
+      (set! (.-id div) "caret-position-div"))
+      ; (doseq [[k v] {"position" "absolute"
+      ;                ; "background-color" "red"
+      ;                "border-top" "solid 1px rgba(0,255,0,.75)"
+      ;                "white-space" "nowrap"
+      ;                "overflow" "hidden"
+      ;                "width" "18px"
+      ;                "height" "1px"}]
+      ;   (aset (.-style div) k v)))
     (doseq [[k v] {"top" (str (first coord) "px")
                    "left" (str (last coord) "px")}]
       (aset (.-style div) k v))
