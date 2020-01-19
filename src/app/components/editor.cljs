@@ -31,6 +31,9 @@
             (.setSelection @this nil)
             (.setSelection @this (first selection) (second selection) "api"))
 
+          (let [ql-clipboard (js/document.querySelector ".ql-clipboard")]
+            (aset (.-style ql-clipboard) "visibility" "hidden"))
+
           (dispatch [:set-quill @this]))
 
         :component-will-receive-props
@@ -81,6 +84,7 @@
           (str  "welcome to reagent-quill!<br>"
                 "aaaaa<br>"
                 "bbbbb<br>"
+                "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ <br>"
                 "Returns the lines contained within the specified location.")
           :selection nil
           :on-change-fn #(if (= % "user")
