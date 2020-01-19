@@ -5,6 +5,8 @@
     "box-sizing"
     "width"  ;; on Chrome and IE exclude the scrollbar so the mirror div wraps exactly as the textarea does
     "height"
+    "top"
+    "left"
     "overflow-x"
     "overflow-y"  ;; copy the scrollbar for IE
 
@@ -44,12 +46,12 @@
 (def is-browser (exists? js/window))
 (def is-firefox (and is-browser (exists? js/window.mozInnerScreenX)))
 
-(defn coordinates [e position innter-html]
+(defn coordinates [e innter-html]
   (let [div (js/document.createElement "div")
         computed (js/window.getComputedStyle e)
         span (js/document.createElement "span")]
     (set! (.-id div) "input-textarea-caret-position-mirror-div")
-    (js/document.body.appendChild div)
+    (js/document.body.prependChild div)
     (doall (map #(aset (.-style div) % (.getPropertyValue computed %)) properties))
     (doseq [[k v] {"writing-mode" "vertical-lr"
                    "position" "absolute"
@@ -72,3 +74,6 @@
     [(+ (.-offsetTop span) (js/parseInt (.getPropertyValue computed "border-top-width")))
      (+ (.-offsetLeft span) (js/parseInt (.getPropertyValue computed "border-left-width")))
      (js/parseInt (.getPropertyValue computed "line-height"))]))
+
+(defn editor-div []
+  (js/document.querySelector ".ql-editor"))
