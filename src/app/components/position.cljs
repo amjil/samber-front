@@ -90,14 +90,6 @@
 (defn editor-div []
   (js/document.querySelector ".ql-editor"))
 
-(defn index [idx]
-  (let [div (editor-div)
-        quill @(subscribe [:quill])
-        quill-delta (quill-util/delta quill idx)
-        html-content (quill-util/delta-to-html quill-delta)
-        coord (coordinates div html-content)]
-    coord))
-
 (defn del-mirror-dev []
   (.remove (js/document.getElementById "caret-position-mirror-div")))
 
@@ -115,3 +107,11 @@
                    "left" (str (last coord) "px")}]
       (aset (.-style div) k v))
     (when-not caret-div (js/document.body.appendChild div))))
+
+(defn index [idx]
+  (let [div (editor-div)
+        quill @(subscribe [:quill])
+        quill-delta (quill-util/delta quill idx)
+        html-content (quill-util/delta-to-html quill-delta)
+        coord (coordinates div html-content)]
+    (caret coord)))

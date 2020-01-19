@@ -56,13 +56,11 @@
                  :style {:width "100%"
                          :display "flex"
                          :flex-direction "row"}}
-                         ; :overflow "auto"}}
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
                   :on-click (fn [x]
-                              (let [quill @(subscribe [:quill])]
-                                (js/console.log "xxxxxxx")
-                                (js/console.log (.getSelection @this))))
+                              (js/console.log "xxxxxxx")
+                              (position/index (.-index (.getSelection @this))))
                   :on-blur (fn [] (js/console.log "blur ......"))
                   :style {:overflow-y "auto"
                           :width "100%"}
