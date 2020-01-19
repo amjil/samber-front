@@ -60,6 +60,7 @@
                   :class "quill-editor"
                   :on-click (fn [x]
                               (js/console.log "xxxxxxx")
+                              (js/console.log (.getSelection @this))
                               (position/index (.-index (.getSelection @this))))
                   :on-blur (fn [] (js/console.log "blur ......"))
                   :style {:overflow-y "auto"
@@ -83,7 +84,8 @@
                 "aaaaa<br>"
                 "bbbbb<br>"
                 "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ <br>"
-                "Returns the lines contained within the specified location.")
+                "Returns the lines contained within the specified location.<br>"
+                "direction: ltr;box-sizing: border-box;width: 90px;height: 408.906px;overflow: hidden;border-width: 0px;border-style: none;padding: 0px;text-align: start;text-transform: none;text-indent: 0px;text-decoration: none solid rgb(85, 85, 85);letter-spacing: normal;word-spacing: 0px;white-space: pre-wrap;tab-size: 8;writing-mode: vertical-lr;position: absolute;visibility: hidden;top: 58px;left: 13px;")
           :selection nil
           :on-change-fn #(if (= % "user")
                            (do

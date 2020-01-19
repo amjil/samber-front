@@ -46,7 +46,7 @@
 (def is-browser (exists? js/window))
 (def is-firefox (and is-browser (exists? js/window.mozInnerScreenX)))
 
-(defn coordinates [e innter-html]
+(defn coordinates [e inner-html]
   (let [position-mirror (js/document.getElementById "caret-position-mirror-div")
         div (if position-mirror position-mirror (js/document.createElement "div"))
         computed (js/window.getComputedStyle e)
@@ -68,21 +68,14 @@
           (aset (.-style div) "overflow-y" "scroll"))
         (aset (.-style div) "overflow" "hidden")))
 
-    (set! (.-innerHTML div) innter-html)
+    (set! (.-innerHTML div) inner-html)
     (set! (.-id span) "caret-position-mirror-span")
-    (set! (.-textContent span) ".")
-    ; (doseq [[k v] {"visibility" "visible"
-    ;                "background-color" "red"
-    ;                "width" "18px"
-    ;                "height" "0.5px"}]
-    ;   (aset (.-style span) k v))
+    (set! (.-textContent span) "")
 
     (if (= 1 (.-length (.-children div)))
       (.appendChild (aget (.-children div) 0) span)
       (.appendChild div span))
 
-    (when (.-offsetParent span)
-      (js/console.log ">>>>>>>>>>>>>>>>>>>>>>>>>>"))
     ;; [top left ]
     [(+ (.-offsetTop div) (.-offsetTop span))
      (+ (.-offsetLeft div) (.-offsetLeft span))]))
@@ -98,14 +91,6 @@
         div (if caret-div caret-div (js/document.createElement "div"))]
     (when-not caret-div
       (set! (.-id div) "caret-position-div"))
-      ; (doseq [[k v] {"position" "absolute"
-      ;                ; "background-color" "red"
-      ;                "border-top" "solid 1px rgba(0,255,0,.75)"
-      ;                "white-space" "nowrap"
-      ;                "overflow" "hidden"
-      ;                "width" "18px"
-      ;                "height" "1px"}]
-      ;   (aset (.-style div) k v)))
     (doseq [[k v] {"top" (str (first coord) "px")
                    "left" (str (last coord) "px")}]
       (aset (.-style div) k v))
@@ -114,7 +99,7 @@
 (defn index [idx]
   (let [div (editor-div)
         quill @(subscribe [:quill])
-        quill-delta (quill-util/delta quill idx)
+        quill-delta (quill-util/delta quill 0 idx)
         html-content (quill-util/delta-to-html quill-delta)
         coord (coordinates div html-content)]
     (caret coord)))
