@@ -46,11 +46,11 @@
 (def is-browser (exists? js/window))
 (def is-firefox (and is-browser (exists? js/window.mozInnerScreenX)))
 
-(defn coordinates [e inner-html]
+(defn coordinates [e inner-html inner-append]
   (let [position-mirror (js/document.getElementById "caret-position-mirror-div")
         div (if position-mirror position-mirror (js/document.createElement "div"))
-        computed (js/window.getComputedStyle e)
-        span (js/document.createElement "span")]
+        computed (js/window.getComputedStyle e)]
+        ; span (js/document.createElement "span")]
     (when-not position-mirror
       (set! (.-id div) "caret-position-mirror-div")
       (js/document.body.appendChild div)
@@ -68,17 +68,21 @@
           (aset (.-style div) "overflow-y" "scroll"))
         (aset (.-style div) "overflow" "hidden")))
 
-    (set! (.-innerHTML div) inner-html)
-    (set! (.-id span) "caret-position-mirror-span")
-    (set! (.-textContent span) "")
+    (set! (.-innerHTML div)
+      (str "<span style='position: relative; display: inline;'>" inner-html "</span>"
+           "<span id='caret-position-mirror-span' style='position: relative; display: inline;'>|</span>"
+           "<span style='position: relative; display: inline;'>" inner-append "</span>"))
+    ; (set! (.-id span) "caret-position-mirror-span")
+    ; (set! (.-textContent span) "")
 
-    (if (= 1 (.-length (.-children div)))
-      (.appendChild (aget (.-children div) 0) span)
-      (.appendChild div span))
+    ; (if (= 1 (.-length (.-children div)))
+    ;   (.appendChild (aget (.-children div) 0) span)
+    ;   (.appendChild div span))
+    (let [span (js/document.getElementById "caret-position-mirror-span")]
 
-    ;; [top left ]
-    [(+ (.-offsetTop div) (.-offsetTop span))
-     (+ (.-offsetLeft div) (.-offsetLeft span))]))
+      ;; [top left ]
+      [(+ (.-offsetTop div) (.-offsetTop span))
+       (+ (.-offsetLeft div) (.-offsetLeft span))])))
 
 (defn editor-div []
   (js/document.querySelector ".ql-editor"))
@@ -100,6 +104,15 @@
   (let [div (editor-div)
         quill @(subscribe [:quill])
         quill-delta (quill-util/delta quill 0 idx)
+        quill-delta2 (quill-util/delta quill idx (.getLength quill))
+        ; _ (js/console.log "<<<<<<")
         html-content (quill-util/delta-to-html quill-delta)
-        coord (coordinates div html-content)]
+        ; _ (js/console.log html-content)
+        ; _ (js/console.log (subs html-content 3 (- (count html-content) 4)))
+        html-content2 (quill-util/delta-to-html quill-delta2)
+        ; _ (js/console.log html-content2)
+        ; _ (js/console.log (subs html-content2 3 (- (count html-content2) 4)))
+        coord (coordinates div
+                           (subs html-content 3 (- (count html-content) 4))
+                           (subs html-content2 3 (- (count html-content2) 4)))]
     (caret coord)))
