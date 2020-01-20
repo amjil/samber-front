@@ -1,15 +1,18 @@
 #caret-position-div {
   position: absolute;
-  border-top: solid 1px rgba(0,255,0,.75);
+  border-top: solid 2px rgba(0,0,0,.75);
   white-space: nowrap;
   overflow: hidden;
   width: 20px;
-  height: 2px;
+  height: 1px;
 }
 #caret-position-div {
   animation: animated-cursor 600ms linear infinite;
 }
+#caret-position-div > p {
+  display: inline;
+}
 @keyframes animated-cursor{
-  from{ border-top-color: rgba(0,255,0,.75); }
+  from{ border-top-color: rgba(0,0,0,.75); }
   to{ border-top-color: transparent; }
 }

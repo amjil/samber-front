@@ -5,4 +5,5 @@
   (.getContents quill start-idx end-idx))
 
 (defn delta-to-html [dlt]
-  (.convert (QuillDeltaToHtmlConverter. (.-ops dlt) {})))
+  (let [opts #js {"paragraphTag" "span"}]
+    (.convert (QuillDeltaToHtmlConverter. (.-ops dlt) opts))))

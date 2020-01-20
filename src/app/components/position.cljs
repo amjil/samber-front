@@ -22,14 +22,14 @@
     "padding-left"
 
     ;; https://developer.mozilla.org/en-US/docs/Web/CSS/font
-    ; "font-style"
-    ; "font-variant"
-    ; "font-weight"
-    ; "font-stretch"
-    ; "font-size"
-    ; "font-size-adjust"
-    ; "line-height"
-    ; "font-family"
+    "font-style"
+    "font-variant"
+    "font-weight"
+    "font-stretch"
+    "font-size"
+    "font-size-adjust"
+    "line-height"
+    "font-family"
 
     "text-align"
     "text-transform"
@@ -69,16 +69,18 @@
         (aset (.-style div) "overflow" "hidden")))
 
     (set! (.-innerHTML div)
-      (str "<span style='position: relative; display: inline;'>" inner-html "</span>"
-           "<span id='caret-position-mirror-span' style='position: relative; display: inline;'>|</span>"
-           "<span style='position: relative; display: inline;'>" inner-append "</span>"))
+      ; (str "<span style='position: relative; display: inline;'>" inner-html "</span>")
+      (str inner-html
+           "<span id='caret-position-mirror' style='position: relative; display: inline;width: 0; height: 0'></span>"
+           inner-append))
+           ; "<span style='position: relative; display: inline;'>" inner-append "</span>"))
     ; (set! (.-id span) "caret-position-mirror-span")
     ; (set! (.-textContent span) "")
 
     ; (if (= 1 (.-length (.-children div)))
     ;   (.appendChild (aget (.-children div) 0) span)
     ;   (.appendChild div span))
-    (let [span (js/document.getElementById "caret-position-mirror-span")]
+    (let [span (js/document.getElementById "caret-position-mirror")]
 
       ;; [top left ]
       [(+ (.-offsetTop div) (.-offsetTop span))
@@ -105,14 +107,17 @@
         quill @(subscribe [:quill])
         quill-delta (quill-util/delta quill 0 idx)
         quill-delta2 (quill-util/delta quill idx (.getLength quill))
-        ; _ (js/console.log "<<<<<<")
+        _ (js/console.log "<<<<<<")
         html-content (quill-util/delta-to-html quill-delta)
         ; _ (js/console.log html-content)
-        ; _ (js/console.log (subs html-content 3 (- (count html-content) 4)))
+        hlen (count html-content)
+        xstr (subs html-content (- hlen 19) hlen)
+        _ (js/console.log (subs html-content (- hlen 19) hlen))
         html-content2 (quill-util/delta-to-html quill-delta2)
         ; _ (js/console.log html-content2)
-        ; _ (js/console.log (subs html-content2 3 (- (count html-content2) 4)))
         coord (coordinates div
-                           (subs html-content 3 (- (count html-content) 4))
-                           (subs html-content2 3 (- (count html-content2) 4)))]
+                           ; (subs html-content 3 (- (count html-content) 4))
+                           ; (subs html-content2 3 (- (count html-content2) 4)))]
+                           html-content
+                           html-content2)]
     (caret coord)))

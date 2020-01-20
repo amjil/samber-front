@@ -60,8 +60,12 @@
                   :class "quill-editor"
                   :on-click (fn [x]
                               (js/console.log "xxxxxxx")
-                              (js/console.log (.getSelection @this))
-                              (position/index (.-index (.getSelection @this))))
+                              (let [idx (.-index (.getSelection @this))
+                                    idx (if (some #{(.getText @this idx 1)} [" " " "]) (+ 1 idx) idx)]
+                                (js/console.log "--------------")
+                                (js/console.log (= (.getText @this idx 1) " "))
+                                (js/console.log "--------------")
+                                (position/index idx)))
                   :on-blur (fn [] (js/console.log "blur ......"))
                   :style {:overflow-y "auto"
                           :width "100%"}
@@ -84,8 +88,10 @@
                 "aaaaa<br>"
                 "bbbbb<br>"
                 "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ <br>"
-                "Returns the lines contained within the specified location.<br>"
-                "direction: ltr;box-sizing: border-box;width: 90px;height: 408.906px;overflow: hidden;border-width: 0px;border-style: none;padding: 0px;text-align: start;text-transform: none;text-indent: 0px;text-decoration: none solid rgb(85, 85, 85);letter-spacing: normal;word-spacing: 0px;white-space: pre-wrap;tab-size: 8;writing-mode: vertical-lr;position: absolute;visibility: hidden;top: 58px;left: 13px;")
+                "ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠬᠤᠷᠠᠭ᠎ᠠ ᠬᠣᠶᠠᠷ ᠬᠦᠴᠦᠨ ᠪᠠᠭᠤᠷᠠᠢ ᠨᠢ ᠬᠦᠴᠦᠲᠡᠨ ᠤ ᠳᠡᠷᠭᠡᠲᠡ ᠬᠡᠵᠢᠶᠡᠲᠡ ᠵᠥᠪ ᠢᠶᠡᠨ ᠣᠯᠳᠠᠭ ᠦᠭᠡᠢ ᠦᠯᠢᠭᠡᠷ ᠵᠢᠱᠢᠶ᠎ᠡ ᠲᠡᠦᠬᠡ ᠱᠠᠰᠲᠢᠷ ᠲᠤ ᠣᠯᠠᠨ ᠪᠠᠢ᠌ᠳᠠᠭ᠂ ᠭᠡᠪᠡᠴᠦ ᠪᠢ ᠡᠨᠳᠡ ᠲᠡᠦᠬᠡ ᠶᠠᠷᠢᠬᠤ ᠦᠭᠡᠢ᠂ ᠬᠠᠷᠢᠨ ᠡᠨᠡ ᠲᠤᠬᠠᠢ ᠨᠢᠭᠡ ᠶᠣᠭᠲᠠ ᠦᠯᠢᠭᠡᠷ ᠶᠠᠷᠢᠶ᠎ᠠ᠃
+ᠨᠢᠭᠡᠨ ᠬᠠᠯᠠᠭᠤᠨ ᠡᠳᠦᠷ ᠬᠤᠷᠠᠭ᠎ᠠ ᠭᠣᠷᠣᠬ᠎ᠠ ᠳᠡᠭᠡᠷ᠎ᠠ ᠤᠰᠤ ᠤᠤᠭᠤᠬᠤ ᠪᠡᠷ ᠣᠴᠢᠭᠠᠳ᠂ ᠭᠠᠢ ᠭᠠᠮᠰᠢᠭ ᠲᠤ ᠤᠴᠠᠷᠠᠬᠤ ᠨᠢ ᠭᠠᠷᠴᠠᠭ᠎ᠠ ᠦᠭᠡᠢ ᠪᠣᠯᠪᠠ᠂ ᠤᠴᠢᠷ ᠨᠢ ᠲᠡᠭᠦᠪᠡᠷ ᠨᠢᠭᠡ ᠦᠯᠦᠨ ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠢᠳᠡᠰᠢ ᠬᠠᠢ᠌ᠨ ᠦᠯᠪᠡᠯᠵᠡᠨ ᠶᠠᠪᠤᠵᠤ ᠪᠠᠢ᠌ᠵᠠᠢ᠃
+ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠬᠤᠷᠠᠭ᠎ᠠ ᠶᠢ ᠦᠵᠡᠭᠡᠳ᠂ ᠲᠡᠷᠡ ᠬᠦ ᠪᠡᠯᠡᠨ ᠬᠣᠭᠣᠯᠠ ᠤᠷᠤᠭᠤ ᠤᠬᠤᠰᠭᠢᠨ ᠬᠦᠷᠥᠯ᠎ᠡ᠃ ᠭᠡᠪᠡᠴᠦ ᠲᠡᠭᠦᠨ ᠢ ᠢᠳᠡᠬᠦ ᠳ᠋ᠤ ᠪᠠᠨ ᠤᠴᠢᠷ ᠰᠢᠯᠲᠠᠭᠠᠨ ᠭᠠᠷᠭᠠᠬᠤ ᠶᠢᠨ ᠲᠦᠯᠦᠭᠡ:
+《 ᠬᠦᠶᠢ᠋᠂ ᠴᠢ ᠮᠠᠭᠤ ᠨᠢᠭᠤᠷ ᠦᠭᠡᠢ ᠠᠮᠢᠲᠠᠨ᠂ ᠶᠠᠭᠤ ᠭᠡᠵᠦ ᠪᠣᠵᠠᠷ ᠬᠣᠩᠰᠢᠶᠠᠷ ᠢᠶᠡᠷ ᠢᠶᠡᠨ ᠮᠢᠨᠦ ᠡᠨᠳᠡᠬᠢ ᠠᠷᠢᠭᠤᠨ ᠤᠮᠳᠠᠭᠠᠨ ᠢ ᠰᠢᠪᠠᠷ ᠱᠠᠪᠠᠬᠠᠢ ᠪᠡᠷ ᠪᠣᠯᠠᠩᠬᠢᠷᠲᠤᠭᠤᠯᠪᠠ᠂ ᠴᠢᠨᠦ ᠡᠨᠡ ᠬᠦ ᠬᠡᠷᠴᠡᠭᠡᠢ ᠪᠠᠯᠠᠮᠠᠳ ᠠᠵᠢᠯᠯᠠᠭᠠᠨ ᠤ ᠬᠠᠷᠢᠭᠤ ᠳ᠋ᠤ ᠪᠢ ᠪᠠᠭᠠᠯᠵᠠᠭᠤᠷ ᠢ ᠴᠢᠨᠢ ᠲᠠᠰᠤ ᠬᠠᠵᠠᠨ᠎ᠠ》 ᠭᠡᠵᠦ ᠵᠠᠩᠳᠤᠷᠤᠨ ᠬᠡᠯᠡᠪᠡ᠃")
           :selection nil
           :on-change-fn #(if (= % "user")
                            (do
