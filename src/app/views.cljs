@@ -6,7 +6,8 @@
             [app.components.quill :as quill]
             [app.components.home :as home]
             [app.components.login :as login]
-            [app.components.editor :as editor]))
+            [app.components.editor :as editor]
+            [app.components.hammer :as hammer]))
 
 (defn pages [page-name]
   (case page-name

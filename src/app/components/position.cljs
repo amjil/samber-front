@@ -92,6 +92,11 @@
 (defn del-mirror-dev []
   (.remove (js/document.getElementById "caret-position-mirror-div")))
 
+;;
+(defn offset []
+  nil)
+;;
+
 (defn caret [coord]
   (let [caret-div (js/document.getElementById "caret-position-div")
         div (if caret-div caret-div (js/document.createElement "div"))]

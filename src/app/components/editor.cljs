@@ -34,6 +34,20 @@
           (let [ql-clipboard (js/document.querySelector ".ql-clipboard")]
             (aset (.-style ql-clipboard) "visibility" "hidden"))
 
+          (let [ql-editor (js/document.querySelector ".ql-editor")]
+            (.addEventListener ql-editor
+              "click"
+              (fn [e]
+                (js/console.log (.-clientX e) " ----- " (.-clientY e))
+                (let [range (js/document.caretRangeFromPoint (.-clientX e) (.-clientY e))
+                      cloned-range (.cloneRange range)]
+                  (.setStart cloned-range (.-endContainer range) (- (.-endOffset range) 1))
+                  (.setEnd cloned-range (.-endContainer range) (.-endOffset range))
+                  ; (js/console.log (.-startContainer range) " ===== " (.-startOffset range))))))
+                  (js/console.log (.getBoundingClientRect cloned-range))
+                  (.detach cloned-range)))))
+
+
           (dispatch [:set-quill @this]))
 
         :component-will-receive-props
