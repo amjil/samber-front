@@ -6,7 +6,8 @@
      [app.components.tabbar :as tabbar]
      [app.components.navbar :as navbar]
      [app.components.quill :as qeditor]
-     [app.components.position :as position]))
+     [app.components.caret :as caret]
+     ["react-hammerjs" :default Hammer]))
 
   (defn editor [{:keys [id content selection on-change-fn]}]
     (let [this (r/atom nil)
@@ -38,15 +39,7 @@
             (.addEventListener ql-editor
               "click"
               (fn [e]
-                (js/console.log (.-clientX e) " ----- " (.-clientY e))
-                (let [range (js/document.caretRangeFromPoint (.-clientX e) (.-clientY e))
-                      cloned-range (.cloneRange range)]
-                  (.setStart cloned-range (.-endContainer range) (- (.-endOffset range) 1))
-                  (.setEnd cloned-range (.-endContainer range) (.-endOffset range))
-                  ; (js/console.log (.-startContainer range) " ===== " (.-startOffset range))))))
-                  (js/console.log (.getBoundingClientRect cloned-range))
-                  (.detach cloned-range)))))
-
+                (caret/index [(.-clientX e) (.-clientY e)]))))
 
           (dispatch [:set-quill @this]))
 
@@ -73,13 +66,10 @@
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
                   :on-click (fn [x]
-                              (js/console.log "xxxxxxx")
-                              (let [idx (.-index (.getSelection @this))
-                                    idx (if (some #{(.getText @this idx 1)} [" " " "]) (+ 1 idx) idx)]
-                                (js/console.log "--------------")
-                                (js/console.log (= (.getText @this idx 1) " "))
-                                (js/console.log "--------------")
-                                (position/index idx)))
+                              (js/console.log "xxxxxxx"))
+                              ; (let [idx (.-index (.getSelection @this))
+                              ;       idx (if (some #{(.getText @this idx 1)} [" " " "]) (+ 1 idx) idx)]
+                              ;   (position/index idx)))
                   :on-blur (fn [] (js/console.log "blur ......"))
                   :style {:overflow-y "auto"
                           :width "100%"}

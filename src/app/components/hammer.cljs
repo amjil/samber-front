@@ -15,4 +15,4 @@
        [:> Hammer
         {:onTap #(js/console.log "OnTap .....")
          :onDoubleTap #(js/console.log "OnDoubleTap .....")}
-        [:div "Touch Me"]])}))
+        [:div "touch me"]])}))
