@@ -7,7 +7,8 @@
             [app.components.home :as home]
             [app.components.login :as login]
             [app.components.editor :as editor]
-            [app.components.hammer :as hammer]))
+            [app.components.hammer :as hammer]
+            [app.components.keyboard :as keyboard]))
 
 (defn pages [page-name]
   (case page-name
@@ -20,7 +21,7 @@
                         :on-change-fn #(if (= % "user")
                                          (println (str "text changed: " %2)))}]
     :editor           [editor/index]
-    [home/index]))
+    [keyboard/index]))
 
 (defn app []
   (fn []
