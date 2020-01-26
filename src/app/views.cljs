@@ -21,7 +21,7 @@
                         :on-change-fn #(if (= % "user")
                                          (println (str "text changed: " %2)))}]
     :editor           [editor/index]
-    [keyboard/index]))
+    [editor/index]))
 
 (defn app []
   (fn []

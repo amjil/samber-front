@@ -29,6 +29,6 @@
 
     (when-not caret-div
       (set! (.-id div) "caret-position-div")
-      (let [quill-wrapper (js/document.getElementById "quill-editor-my-editor-id")]
+      (let [quill-wrapper (js/document.getElementById "app")]
         (.appendChild quill-wrapper div)))
     (.detach cloned-range)))
