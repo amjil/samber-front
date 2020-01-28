@@ -41,14 +41,6 @@
               (fn [e]
                 (caret/index (.getRangeAt (js/window.getSelection) 0)))))
 
-          (let [editor-wrap (js/document.getElementById "quill-editor-my-editor-id")]
-            (.addEventListener editor-wrap
-              "scroll"
-              (fn [e]
-                (let [caret-div (js/document.getElementById "caret-position-div")]
-                  (if caret-div
-                    (caret/index (.getRangeAt (js/window.getSelection) 0)))))))
-
           (dispatch [:set-quill @this]))
 
         :component-will-receive-props
@@ -74,7 +66,8 @@
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
                   :style {:overflow-y "auto"
-                          :width "100%"}
+                          :width "100%"
+                          :position "relative"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
 
   (defn index []
