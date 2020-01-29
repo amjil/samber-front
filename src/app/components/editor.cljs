@@ -39,7 +39,8 @@
             (.addEventListener ql-editor
               "click"
               (fn [e]
-                (caret/index (.getRangeAt (js/window.getSelection) 0)))))
+                (caret/index (.getRangeAt (js/window.getSelection) 0))
+                (caret/selection-caret))))
 
           (dispatch [:set-quill @this]))
 
@@ -67,7 +68,8 @@
                   :class "quill-editor"
                   :style {:overflow-y "auto"
                           :width "100%"
-                          :position "relative"}
+                          :position "relative"
+                          :padding-top "1px"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
 
   (defn index []

@@ -36,3 +36,12 @@
       (let [quill-wrapper (js/document.getElementById "quill-editor-my-editor-id")]
         (.appendChild quill-wrapper div)))
     (.detach cloned-range)))
+
+(defn selection-caret []
+  (let [caret-div (js/document.getElementById "caret-position-div")
+        dot-span (.querySelector caret-div ".dot")]
+    (when (and caret-div (not dot-span))
+      (js/console.log "xxxxxx............")
+      (let [dot-span (js/document.createElement "span")]
+        (.add (.-classList dot-span) "dot")
+        (.appendChild caret-div dot-span)))))
