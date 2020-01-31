@@ -1,6 +1,9 @@
 (ns app.components.caret
   (:require [reagent.core :as r]
-            [re-frame.core :refer [subscribe]]))
+            [re-frame.core :refer [subscribe]])
+  (:import [goog.async Debouncer]))
+
+(declare selection-caret)
 
 (defn index [range]
   (let [caret-div (js/document.getElementById "caret-position-div")
@@ -39,7 +42,17 @@
             (.appendChild quill-wrapper div)))
         (.detach cloned-range)))))
 
-(defn selection-caret []
+(defn selection-caret-hide []
+  (let [caret-div (js/document.getElementById "caret-position-div")
+        dot-span (.querySelector caret-div ".dot")]
+    (aset (.-style dot-span) "display" "none")))
+
+(defn selection-caret-show []
+  (let [caret-div (js/document.getElementById "caret-position-div")
+        dot-span (.querySelector caret-div ".dot")]
+    (aset (.-style dot-span) "display" "inline-block")))
+
+(defn selection-caret [hide-selection]
   (let [caret-div (js/document.getElementById "caret-position-div")
         dot-span (.querySelector caret-div ".dot")
         total (r/atom 0)
@@ -47,24 +60,30 @@
     (when (and caret-div (not dot-span))
       (let [dot-span (js/document.createElement "span")
             touch-start (fn [e]
-                          (js/console.log "touch-start ...."))
+                          (js/console.log "touch-start ....")
+                          (.fire hide-selection))
             touch-move (fn [e]
                          (let [moved (aget (.-touches e) 0)
                                moved-x (- (.-clientX moved) 14)
                                moved-y (.-clientY moved)
-                               range (js/document.caretRangeFromPoint moved-x moved-y)]
+                               range (js/document.caretRangeFromPoint moved-x moved-y)
+                               dot-span (.querySelector caret-div ".dot")]
                            (swap! total + 1)
+                           (if (= "none" (aget (.-style dot-span) "display"))
+                             (selection-caret-show))
+                           (.fire hide-selection)
                            (when-not (or
                                        (= "caret-position-div" (.-id (.-endContainer range)))
                                        (= "caret-position-div" (.-id (.-parentNode (.-endContainer range)))))
                              (index range)
                              (reset! current-range range))))
-
             touch-end (fn [e]
                         (js/console.log "touch-end ...." @total)
                         (reset! total 0)
                         (when @current-range
-                          (.collapse (js/window.getSelection) (.-endContainer @current-range) (.-endOffset @current-range))))]
+                          (.collapse (js/window.getSelection) (.-endContainer @current-range) (.-endOffset @current-range))
+                          (reset! current-range nil))
+                        (.fire hide-selection))]
 
         (.addEventListener dot-span "touchstart" touch-start)
         (.addEventListener dot-span "touchmove" touch-move)

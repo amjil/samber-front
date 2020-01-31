@@ -7,11 +7,16 @@
      [app.components.navbar :as navbar]
      [app.components.quill :as qeditor]
      [app.components.caret :as caret]
-     ["react-hammerjs" :default Hammer]))
+     ["react-hammerjs" :default Hammer]
+     ["dayjs" :as dayjs])
+    (:import
+     [goog.async Debouncer]))
 
   (defn editor [{:keys [id content selection on-change-fn]}]
     (let [this (r/atom nil)
-          value #(aget @this "container" "firstChild" "innerHTML")]
+          value #(aget @this "container" "firstChild" "innerHTML")
+          last-tap-time (r/atom nil)
+          hide-selection (Debouncer. caret/selection-caret-hide 2000)]
       (r/create-class
        {:component-did-mount
         (fn [component]
@@ -40,7 +45,11 @@
               "click"
               (fn [e]
                 (caret/index (.getRangeAt (js/window.getSelection) 0))
-                (caret/selection-caret))))
+                (when (and @last-tap-time (> 4 (- (.unix (dayjs)) @last-tap-time)))
+                  (.fire hide-selection)
+                  (caret/selection-caret hide-selection)
+                  (caret/selection-caret-show))
+                (reset! last-tap-time (.unix (dayjs))))))
 
           (dispatch [:set-quill @this]))
 
