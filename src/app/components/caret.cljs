@@ -60,6 +60,7 @@
     (when (and caret-div (not dot-span))
       (let [dot-span (js/document.createElement "span")
             touch-start (fn [e]
+                          (.preventDefault e)
                           (js/console.log "touch-start ....")
                           (.fire hide-selection))
             touch-move (fn [e]
@@ -88,6 +89,9 @@
         (.addEventListener dot-span "touchstart" touch-start)
         (.addEventListener dot-span "touchmove" touch-move)
         (.addEventListener dot-span "touchend" touch-end)
+        (.addEventListener dot-span "scroll"
+          (fn [e]
+            (js/console.log "scroll ....")))
 
         (.add (.-classList dot-span) "dot")
         (.appendChild caret-div dot-span)))))

@@ -7,8 +7,10 @@
      [app.components.navbar :as navbar]
      [app.components.quill :as qeditor]
      [app.components.caret :as caret]
+     [app.components.long-tap :as long-tap]
      ["react-hammerjs" :default Hammer]
-     ["dayjs" :as dayjs])
+     ["dayjs" :as dayjs]
+     ["@better-scroll/core" :default BScroll])
     (:import
      [goog.async Debouncer]))
 
@@ -41,15 +43,9 @@
             (aset (.-style ql-clipboard) "visibility" "hidden"))
 
           (let [ql-editor (js/document.querySelector ".ql-editor")]
-            (.addEventListener ql-editor
-              "click"
-              (fn [e]
-                (caret/index (.getRangeAt (js/window.getSelection) 0))
-                (when (and @last-tap-time (> 4 (- (.unix (dayjs)) @last-tap-time)))
-                  (.fire hide-selection)
-                  (caret/selection-caret hide-selection)
-                  (caret/selection-caret-show))
-                (reset! last-tap-time (.unix (dayjs))))))
+            (long-tap/index ql-editor this))
+
+          ; (new BScroll ".ql-editor" #js {})
 
           (dispatch [:set-quill @this]))
 
