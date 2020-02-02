@@ -1,21 +1,27 @@
 (ns app.components.long-tap
   (:require
     [reagent.core :as r]
+    [re-frame.core :refer [subscribe]]
+    ["quill" :as Quill]
     ["dayjs" :as dayjs]
     [app.components.caret :as caret]
     [clojure.string :as str])
   (:import
    [goog.async Debouncer]))
 
-(defn- touch-start [e is-long? timer hide-fn]
+(defn- touch-start [e ql-editor is-long? timer hide-fn]
   ; (.preventDefault e)
   (let [caret-div (js/document.getElementById "caret-position-div")
         caret-display (if caret-div (aget (.-style caret-div) "display"))]
     (if (and caret-display (= "none" caret-display))
       (aset (.-style caret-div) "display" "block")))
   (let [location (aget (.-touches e) 0)
-        range (js/document.caretRangeFromPoint (.-clientX location) (.-clientY location))]
-    (.collapse (js/window.getSelection) (.-endContainer range) (.-endOffset range))
+        range (js/document.caretRangeFromPoint (.-clientX location) (.-clientY location))
+        quill @(subscribe [:quill])
+        cloned-range (.cloneRange range)
+        selection-index (+ (.-startOffset cloned-range) (.getIndex quill (.find Quill (.-startContainer cloned-range))))]
+    (.setSelection quill selection-index 0)
+    (js/console.log (.getSelection quill))
     (caret/index range)
     (when (and @timer (> 1000 (- (.valueOf (dayjs)) @timer)))
       (.fire hide-fn)
@@ -51,7 +57,7 @@
             end-text (.getText @this end-index end-offset)
             _ (js/console.log end-text)
             ;;
-            sel-start (if (str/ends-with? start-text " ")
+            sel-start (if (some #{(last start-text)} [" " "\n" "\r"])
                         0
                         (count (last (str/split start-text #"\s"))))
             sel-end (if (str/starts-with? end-text " ")
@@ -78,7 +84,7 @@
         onselect-fn (Debouncer. #(onselect this is-long? long-press-timer) 1000)]
     (.addEventListener el "touchstart"
       (fn [e]
-        (touch-start e is-long? long-press-timer hide-fn)
+        (touch-start e el is-long? long-press-timer hide-fn)
         (.fire onselect-fn)))
     (.addEventListener el "touchmove"
       (fn [e] (touch-move e is-long?)))

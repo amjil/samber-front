@@ -9,8 +9,7 @@
      [app.components.caret :as caret]
      [app.components.long-tap :as long-tap]
      ["react-hammerjs" :default Hammer]
-     ["dayjs" :as dayjs]
-     ["@better-scroll/core" :default BScroll])
+     ["dayjs" :as dayjs])
     (:import
      [goog.async Debouncer]))
 
@@ -74,7 +73,8 @@
                   :style {:overflow-y "auto"
                           :width "100%"
                           :position "relative"
-                          :padding-top "1px"}
+                          :padding-top "1px"
+                          :user-select "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
 
   (defn index []
