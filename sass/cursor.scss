@@ -26,3 +26,39 @@
   right: -14px;
   top: -7px;
 }
+
+#selection-start-div {
+  position: absolute;
+  border-top: solid 1px rgba(0,0,0,.75);
+  white-space: nowrap;
+  width: 20px;
+  height: 1px;
+}
+#selection-start-div {
+  animation: animated-cursor 600ms linear infinite;
+}
+#selection-start-div > p {
+  display: inline;
+}
+#selection-start-div > .dot {
+  left: -14px;
+  top: -7px;
+}
+
+#selection-end-div {
+  position: absolute;
+  border-top: solid 1px rgba(0,0,0,.75);
+  white-space: nowrap;
+  width: 20px;
+  height: 1px;
+}
+#selection-end-div {
+  animation: animated-cursor 600ms linear infinite;
+}
+#selection-end-div > p {
+  display: inline;
+}
+#selection-end-div > .dot {
+  right: -14px;
+  top: -7px;
+}

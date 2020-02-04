@@ -30,6 +30,7 @@
             y (if (> (- (.-endOffset range) 1) 0)
                 (.-bottom bound)
                 (.-top bound))]
+        (js/console.log "<<<<<<<<<" left-index "-" y)
         (doseq [[k v] {"top" (str (- y (.-offsetTop my-editor)) "px")
                        "left" (str left-index "px")}]
           (aset (.-style div) k v))

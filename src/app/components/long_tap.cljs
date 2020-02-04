@@ -5,6 +5,7 @@
     ["quill" :as Quill]
     ["dayjs" :as dayjs]
     [app.components.caret :as caret]
+    [app.components.range-selection :as range-selection]
     [clojure.string :as str])
   (:import
    [goog.async Debouncer]))
@@ -29,6 +30,7 @@
       (caret/selection-caret-show)))
   (reset! timer (.valueOf (dayjs)))
   (reset! is-long? true)
+  (range-selection/hide ql-editor)
   (js/console.log "touch start ...."))
 
 (defn- touch-move [e is-long?]
@@ -39,7 +41,7 @@
   (js/console.log "touch end ...." @is-long?)
   (reset! is-long? false))
 
-(defn- onselect [this is-long? timer]
+(defn- onselect [el this is-long? timer]
   (let [duration (- (.valueOf (dayjs)) @timer)]
     (when (and (true? @is-long?) (<= 800 duration))
       (js/console.log "on selection ...... > " duration)
@@ -70,10 +72,12 @@
         (js/console.log " 2 ... " end-index " -- " end-offset)
         (js/console.log " 3 ... " selected-index " -- " selected-offset)
         (js/console.log " 4 ... " sel-start " -- " sel-end)
+        (range-selection/index el this selected-index 1)
+        (range-selection/index el this (+ selected-index selected-offset) 2)
         (.setSelection @this selected-index selected-offset)
         (let [caret-div (js/document.getElementById "caret-position-div")]
           (aset (.-style caret-div) "display" "none"))))))
-            ; end-text (.getText @this)]))))
+            ; end-text (.getText @this)))))))
 
 
 (defn index [el this]
@@ -81,7 +85,7 @@
         is-long? (r/atom false)
         tap-location (r/atom nil)
         hide-fn (Debouncer. caret/selection-caret-hide 2000)
-        onselect-fn (Debouncer. #(onselect this is-long? long-press-timer) 1000)]
+        onselect-fn (Debouncer. #(onselect el this is-long? long-press-timer) 1000)]
     (.addEventListener el "touchstart"
       (fn [e]
         (touch-start e el is-long? long-press-timer hide-fn)

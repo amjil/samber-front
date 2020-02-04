@@ -8,6 +8,7 @@
      [app.components.quill :as qeditor]
      [app.components.caret :as caret]
      [app.components.long-tap :as long-tap]
+     [app.components.range-selection :as range-selection]
      ["react-hammerjs" :default Hammer]
      ["dayjs" :as dayjs])
     (:import
@@ -44,6 +45,10 @@
           (let [ql-editor (js/document.querySelector ".ql-editor")]
             (long-tap/index ql-editor this))
 
+          (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
+            (range-selection/create-range this my-editor 1)
+            (range-selection/create-range this my-editor 2))
+
           ; (new BScroll ".ql-editor" #js {})
 
           (dispatch [:set-quill @this]))
@@ -70,11 +75,11 @@
                          :flex-direction "row"}}
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
-                  :style {:overflow-y "auto"
-                          :width "100%"
+                  :style {:width "100%"
                           :position "relative"
                           :padding-top "1px"
-                          :user-select "none"}
+                          ; :user-select "none"}
+                          :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
 
   (defn index []
