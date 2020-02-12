@@ -34,14 +34,11 @@
   width: 20px;
   height: 1px;
 }
-#selection-start-div {
-  animation: animated-cursor 600ms linear infinite;
-}
 #selection-start-div > p {
   display: inline;
 }
 #selection-start-div > .dot {
-  left: -14px;
+  right: -14px;
   top: -7px;
 }
 
@@ -51,9 +48,6 @@
   white-space: nowrap;
   width: 20px;
   height: 1px;
-}
-#selection-end-div {
-  animation: animated-cursor 600ms linear infinite;
 }
 #selection-end-div > p {
   display: inline;

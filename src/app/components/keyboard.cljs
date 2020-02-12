@@ -75,4 +75,4 @@
   (fn []
     [:div.simple-keyboard-wrapper
      [:div.simple-keyboard-preview]
-     [num-board]]))
+     [eng-board]]))
