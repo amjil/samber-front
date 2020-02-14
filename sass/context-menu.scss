@@ -1,0 +1,17 @@
+.context-menu {
+  position: fixed;
+  overflow: hidden;
+  transform: translate3d(-50%, -50%, 0);
+  backface-visibility: hidden; // avoid blurry text after scale animation
+  display: flex;
+  flex-direction: row;
+  background-color: honeydew;
+  color: dodgerblue;
+  padding: .2rem;
+  box-shadow:2px 2px 3px #aaaaaa;
+}
+
+.context-menu > div:not(:last-child) {
+  margin-bottom: .5rem;
+  border-bottom: 1px;
+}

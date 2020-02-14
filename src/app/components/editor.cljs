@@ -9,6 +9,7 @@
      [app.components.caret :as caret]
      [app.components.long-tap :as long-tap]
      [app.components.range-selection :as range-selection]
+     [app.components.context-menu :as context-menu]
      ["react-hammerjs" :default Hammer]
      ["dayjs" :as dayjs])
     (:import
@@ -47,7 +48,8 @@
 
           (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
             (range-selection/create-range this my-editor 1)
-            (range-selection/create-range this my-editor 2))
+            (range-selection/create-range this my-editor 2)
+            (context-menu/create-element my-editor))
 
           ; (new BScroll ".ql-editor" #js {})
 
