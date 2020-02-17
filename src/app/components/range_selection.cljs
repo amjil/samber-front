@@ -1,6 +1,10 @@
 (ns app.components.range-selection
   (:require
-    ["quill" :as Quill]))
+    ["quill" :as Quill]
+    [clojure.string :as str]
+    [reagent.core :as r]))
+
+(declare index)
 
 (defn position [range]
   (let [cloned-range (.cloneRange range)
@@ -12,60 +16,98 @@
       (do
         (.insertNode cloned-range shadow-caret)
         (.selectNode cloned-range shadow-caret)))
-    (let [bound (.getBoundingClientRect cloned-range)]
-      (if (= (.-left bound) 0)
-        [nil nil nil]
-        (let [bound (.getBoundingClientRect cloned-range)
-              left-index (.-left bound)
-              y (if (> (- (.-endOffset range) 1) 0)
-                  (.-bottom bound)
-                  (.-top bound))]
-          (.remove shadow-caret)
-          [cloned-range left-index y])))))
+    (let [bound (.getBoundingClientRect cloned-range)
+          range-index
+          (if (= (.-left bound) 0)
+            [nil nil]
+            (let [bound (.getBoundingClientRect cloned-range)
+                  left-index (.-left bound)
+                  y (if (> (- (.-endOffset range) 1) 0)
+                      (.-bottom bound)
+                      (.-top bound))]
+              [left-index y]))]
+      (.remove shadow-caret)
+      range-index)))
 
-(defn move-border [quill e type]
+(defn set-quill-selection [quill el type selection-index q-range]
+  (let [quill-range (.getSelection @quill)]
+    (if (= type 1)
+      (if (>= selection-index (+ (.-index @q-range) (.-length @q-range)))
+        (let [select-text (.getText @quill selection-index 30)
+              sel-end (if (str/starts-with? select-text " ")
+                          1
+                          (count (first (str/split select-text #"\s"))))]
+          (.setSelection @quill selection-index sel-end)
+          (index el quill (+ selection-index sel-end) 2))
+        (do
+          (.setSelection @quill selection-index (- (+ (.-index quill-range) (.-length quill-range)) selection-index))
+          ; bug fix ( @q-range has failed use quill-range to set error range and reset use @q-range)
+          (if (not= (.-length quill-range) (.-length @q-range))
+            (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index)))))
+      (if (<= selection-index (.-index quill-range))
+        (let [start-index (max (- selection-index 30) 0)
+              select-text (.getText @quill start-index (- selection-index start-index))
+              sel-start (if (some #{(last select-text)} [" " "\n" "\r"])
+                          1
+                          (count (last (str/split select-text #"\s"))))]
+          (.setSelection @quill (- selection-index sel-start) sel-start)
+          (index el quill (- selection-index sel-start) 1))
+        (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range)))))))
+
+
+(defn move-border [quill el q-range e type]
   (let [moved (aget (.-touches e) 0)
         moved-x (+ (.-clientX moved) (- 0 14))
         moved-y (.-clientY moved)
         range (js/document.caretRangeFromPoint moved-x moved-y)
-        quill-range (.getSelection @quill)
-        [cloned-range left top] (position range)]
-    (if (nil? cloned-range)
-      (js/console.log "sorry 11!!!")
-      (if-not (or
-                (= "selection-start-div" (.-id (.-endContainer cloned-range)))
-                (= "selection-end-div" (.-id (.-endContainer cloned-range)))
-                (= "dot" (.-className (.-endContainer cloned-range))))
-        (let [range-el (.-parentNode (.-target e))
-              parent-el (.-parentNode range-el)
-              left-index (-> left
-                           (- (.-scrollLeft parent-el))
-                           (- (.-offsetLeft parent-el)))
-              top-index (- top (.-offsetTop parent-el))
-              ;;
-              selection-index
-                (+ (.-endOffset cloned-range) (.getIndex @quill (.find Quill (.-endContainer cloned-range))))]
-          (aset (.-style range-el) "left" (str left-index "px"))
-          (aset (.-style range-el) "top" (str top-index "px"))
-          ;;
-          (if (= type 1)
-            (.setSelection @quill selection-index (- (+ (.-index quill-range) (.-length quill-range)) selection-index))
-            (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range)))))
-        (do
-          (js/console.log "move border nilll......"))))
+        start-el (.-startContainer range)
+        start-offset (.-startOffset range)]
+    (if (nil? (.find Quill start-el))
+      (js/console.log "sorry 11!!!" (.getSelection @quill))
+      (let [
+            selection-index (+ start-offset (.getIndex @quill (.find Quill start-el)))
+            [left top] (position range)
+            ;;;
+
+            range-el (.-parentNode (.-target e))
+            parent-el (.-parentNode range-el)
+            left-index (-> left
+                         (- (.-scrollLeft parent-el))
+                         (- (.-offsetLeft parent-el)))
+            top-index (- top (.-offsetTop parent-el))]
+            ;;;
+            ; quill-range (.getSelection @quill)]
+            ; quill-range @q-range]
+            ;;
+        (aset (.-style range-el) "left" (str left-index "px"))
+        (aset (.-style range-el) "top" (str top-index "px"))
+        (js/console.log "<<<<<<<<<<" selection-index "-" start-offset)
+        ; (js/console.log quill-range)
+        (js/console.log @q-range)
+        ;;
+        ; (if (= type 1)
+        ;   (do
+        ;     (.setSelection @quill selection-index (- (+ (.-index quill-range) (.-length quill-range)) selection-index))
+        ;     (if (not= (.-length quill-range) (.-length @q-range))
+        ;       (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index))))
+        ;   (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range))))
+        (set-quill-selection quill el type selection-index q-range)
+        (reset! q-range (.getSelection @quill))))
     ;;
     (js/console.log "move caret .....")))
 
 (defn create-range [quill el type]
   (let [start-id (if (= 1 type) "selection-start-div" "selection-end-div")
+        quill-range (r/atom nil)
         div (js/document.createElement "div")
         ;;
         span-class "dot"
         span (js/document.createElement "span")
         touch-start (fn [e]
                       (.preventDefault e)
+                      (reset! quill-range (.getSelection @quill))
                       (js/console.log "touch-start ...."))
-        touch-move (fn [e] (move-border quill e type))
+        touch-move (fn [e] (move-border quill el quill-range e type))
         touch-end (fn [e] (js/console.log "touch-end ...."))
         ;;
         shadow-caret (js/document.createTextNode "|")]

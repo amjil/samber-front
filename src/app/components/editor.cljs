@@ -30,6 +30,7 @@
                         :modules #js {:toolbar false}
                         :theme "snow"
                         :readOnly true
+                        ; :debug "info"
                         :placeholder "11Compose an epic..."}))
 
           (.on @this "text-change"
