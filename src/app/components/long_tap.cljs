@@ -15,23 +15,23 @@
   (let [caret-div (js/document.getElementById "caret-position-div")
         caret-display (if caret-div (aget (.-style caret-div) "display"))]
     (if (and caret-display (= "none" caret-display))
-      (aset (.-style caret-div) "display" "block")))
-  (let [location (aget (.-touches e) 0)
-        range (js/document.caretRangeFromPoint (.-clientX location) (.-clientY location))
-        quill @(subscribe [:quill])
-        cloned-range (.cloneRange range)
-        selection-index (+ (.-startOffset cloned-range) (.getIndex quill (.find Quill (.-startContainer cloned-range))))]
-    (.setSelection quill selection-index 0)
-    (js/console.log (.getSelection quill))
-    (caret/index range)
-    (when (and @timer (> 1000 (- (.valueOf (dayjs)) @timer)))
-      (.fire hide-fn)
-      (caret/selection-caret hide-fn)
-      (caret/selection-caret-show)))
-  (reset! timer (.valueOf (dayjs)))
-  (reset! is-long? true)
-  (range-selection/hide ql-editor)
-  (js/console.log "touch start ...."))
+      (aset (.-style caret-div) "display" "block"))
+    (let [location (aget (.-touches e) 0)
+          range (js/document.caretRangeFromPoint (.-clientX location) (.-clientY location))
+          quill @(subscribe [:quill])
+          cloned-range (.cloneRange range)
+          selection-index (+ (.-startOffset cloned-range) (.getIndex quill (.find Quill (.-startContainer cloned-range))))]
+      (.setSelection quill selection-index 0)
+      (js/console.log (.getSelection quill))
+      (caret/set-position caret-div range)
+      (when (and @timer (> 1000 (- (.valueOf (dayjs)) @timer)))
+        (.fire hide-fn)
+        ; (caret/selection-caret hide-fn)
+        (caret/selection-caret-show)))
+    (reset! timer (.valueOf (dayjs)))
+    (reset! is-long? true)
+    (range-selection/hide ql-editor)
+    (js/console.log "touch start ....")))
 
 (defn- touch-move [e is-long?]
   (reset! is-long? false)
@@ -106,4 +106,6 @@
         (js/console.log "selectstart ....")))
     (.addEventListener el "selectchange"
       (fn [e]
-        (js/console.log "selectchange ....")))))
+        (js/console.log "selectchange ....")))
+
+    (caret/create-caret (.-parentNode el) hide-fn)))

@@ -10,6 +10,7 @@
      [app.components.long-tap :as long-tap]
      [app.components.range-selection :as range-selection]
      [app.components.context-menu :as context-menu]
+     [app.components.keyboard :as keyboard]
      ["react-hammerjs" :default Hammer]
      ["dayjs" :as dayjs])
     (:import
@@ -76,11 +77,13 @@
                  :style {:width "100%"
                          :display "flex"
                          :flex-direction "row"}}
+                         ; :overflow "hidden"}}
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
                   :style {:width "100%"
                           :position "relative"
                           :padding-top "1px"
+                          ; :overflow "auto"
                           ; :user-select "none"}
                           :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
@@ -115,3 +118,5 @@
                              (let [quill @(subscribe [:quill])]
                                (js/console.log "xxxxxx")
                                (js/console.log (.getSelection quill)))))}]]]))
+       ; [:div.simple-keyboard-wrapper
+       ;  [keyboard/nine-layout-board]]]))

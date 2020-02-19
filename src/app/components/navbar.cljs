@@ -13,4 +13,4 @@
          [:div.van-nav-bar__left
           {:style {:height "100%"}}
           [:i.van-icon.van-icon-arrow-left.van-nav-bar__arrow]])
-       [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} "sambar"]])))
+       [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} ""]])))

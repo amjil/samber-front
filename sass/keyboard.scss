@@ -127,7 +127,7 @@
 
 .simple-keyboard-wrapper {
   writing-mode: horizontal-tb;
-  height: 100%;
+  // height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -150,6 +150,6 @@
   background: rgb(243, 243, 243);
   border-bottom: 0;
   padding: 0;
-  background-image: url(https://franciscohodge.com/project-pages/simple-keyboard/images/mountains.jpg);
+  // background-image: url(/images/mountains.jpg);
   background-size: cover;
 }
