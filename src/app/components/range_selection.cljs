@@ -37,7 +37,7 @@
     (.setStart range (.-domNode blot) offset)
     (caret/set-position el range)))
 
-(defn set-quill-selection [quill el type selection-index q-range range]
+(defn set-quill-selection [quill el type selection-index q-range]
   (let [quill-range (.getSelection @quill)]
     (if (= type 1)
       (if (>= selection-index (+ (.-index @q-range) (.-length @q-range)))
@@ -52,8 +52,7 @@
           (.setSelection @quill selection-index (- (+ (.-index quill-range) (.-length quill-range)) selection-index))
           ; bug fix ( @q-range has failed use quill-range to set error range and reset use @q-range)
           (if (not= (.-length quill-range) (.-length @q-range))
-            (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index)))
-          (caret/set-position el range)))
+            (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index)))))
       (if (<= selection-index (.-index quill-range))
         (let [start-index (max (- selection-index 30) 0)
               select-text (.getText @quill start-index (- selection-index start-index))
@@ -63,8 +62,7 @@
           (.setSelection @quill (- selection-index sel-start) sel-start)
           (set-range quill (.querySelector (.-parentNode el) "#selection-start-div") (- selection-index sel-start)))
         (do
-          (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range)))
-          (caret/set-position el range))))))
+          (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range))))))))
 
 
 (defn move-border [quill el q-range e type]
@@ -86,15 +84,14 @@
             left-index (-> left
                          (+ (.-scrollLeft (.-parentNode parent-el)))
                          (- (.-offsetLeft parent-el)))
-            top-index (- top (.-offsetTop parent-el))
-            range (js/document.caretRangeFromPoint moved-x moved-y)]
+            top-index (- top (.-offsetTop parent-el))]
             ;;;
             ; quill-range (.getSelection @quill)]
             ; quill-range @q-range]
             ;;
         ; (caret/set-position (.-target e) range)
-        ; (aset (.-style range-el) "left" (str left-index "px"))
-        ; (aset (.-style range-el) "top" (str top-index "px"))
+        (aset (.-style range-el) "left" (str left-index "px"))
+        (aset (.-style range-el) "top" (str top-index "px"))
         (js/console.log "<<<<<<<<<<" selection-index "-" start-offset)
         ; (js/console.log quill-range)
         (js/console.log @q-range)
@@ -105,8 +102,7 @@
         ;     (if (not= (.-length quill-range) (.-length @q-range))
         ;       (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index))))
         ;   (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range))))
-        (let [range (js/document.caretRangeFromPoint moved-x moved-y)]
-          (set-quill-selection quill range-el type selection-index q-range range))
+        (set-quill-selection quill range-el type selection-index q-range)
         (reset! q-range (.getSelection @quill))))
     ;;
     (js/console.log "move caret .....")))
