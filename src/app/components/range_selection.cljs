@@ -30,18 +30,24 @@
       (.remove shadow-caret)
       range-index)))
 
+(defn set-range [quill el selection-index]
+  (let [[blot offset] (.getLeaf @quill selection-index)
+        range (js/document.createRange)]
+    (.setEnd range (.-domNode blot) offset)
+    (.setStart range (.-domNode blot) offset)
+    (caret/set-position el range)))
+
 (defn set-quill-selection [quill el type selection-index q-range range]
   (let [quill-range (.getSelection @quill)]
     (if (= type 1)
       (if (>= selection-index (+ (.-index @q-range) (.-length @q-range)))
         (let [select-text (.getText @quill selection-index 30)
-              sel-end (if (str/starts-with? select-text " ")
+              text-list (str/split select-text #"\s")
+              sel-end (if (or (str/starts-with? select-text " ") (empty? (first text-list)))
                           1
                           (count (first (str/split select-text #"\s"))))]
           (.setSelection @quill selection-index sel-end)
-          (index el quill (+ selection-index sel-end) 2)
-          (js/console.log "xxxxxxxxxxx"))
-          ; (caret/set-position (.querySelector (.-parentNode el) "#selection-end-div") range))
+          (set-range quill (.querySelector (.-parentNode el) "#selection-end-div") (+ selection-index sel-end)))
         (do
           (.setSelection @quill selection-index (- (+ (.-index quill-range) (.-length quill-range)) selection-index))
           ; bug fix ( @q-range has failed use quill-range to set error range and reset use @q-range)
@@ -54,8 +60,7 @@
                           1
                           (count (last (str/split select-text #"\s"))))]
           (.setSelection @quill (- selection-index sel-start) sel-start)
-          (index el quill (- selection-index sel-start) 1))
-          ; (caret/set-position (.querySelector (.-parentNode el) "#selection-start-div") range))
+          (set-range quill (.querySelector (.-parentNode el) "#selection-start-div") (- selection-index sel-start)))
         (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range)))))))
 
 
