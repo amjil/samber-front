@@ -1,13 +1,14 @@
 (ns app.components.caret
   (:require [reagent.core :as r]
-            [re-frame.core :refer [subscribe]])
+            [re-frame.core :refer [subscribe]]
+            ["quill" :as Quill])
   (:import [goog.async Debouncer]))
 
 (declare index selection-caret
          selection-caret-hide selection-caret-show
          set-position)
 
-(defn create-caret [el hide-selection]
+(defn create-caret [quill el hide-selection]
   (let [div (js/document.createElement "div")
         dot-span (js/document.createElement "span")
         current-range (r/atom nil)
@@ -25,7 +26,9 @@
                                    (= "caret-position-div" (.-id (.-endContainer range)))
                                    (= "caret-position-div" (.-id (.-parentNode (.-endContainer range)))))
                          (reset! current-range range)
-                         (set-position (.-parentNode (.-target e)) range))))
+                         (let [selection-index (+ (.-endOffset range) (.getIndex @quill (.find Quill (.-endContainer range))))]
+                           (js/console.log "<<<<<<<<<<" selection-index)
+                           (set-position quill (.-parentNode (.-target e)) selection-index range)))))
                          ; (index range))))
         touch-end (fn [e]
                     (js/console.log "touch-end ....")
@@ -46,7 +49,7 @@
     (set! (.-id div) "caret-position-div")
     (.appendChild el div)))
 
-(defn get-position [el range]
+(defn get-native-position [el range]
   (let [cloned-range (.cloneRange range)
         shadow-caret (js/document.createTextNode "|")]
     (if (> (- (.-endOffset range) 1) 0)
@@ -73,8 +76,20 @@
         (.detach cloned-range)
         [left-index (- y (.-offsetTop parent-el))]))))
 
-(defn set-position [el range]
-  (let [[left top] (get-position el range)]
+(defn get-position [quill el index range]
+  (let [[blot offset] (.getLeaf @quill index)
+        bound (.getBounds @quill index offset)
+        left-index (.-left bound)
+        top-index (.-top bound)
+        [left top]
+        (if (<= top-index 1)
+          (let [[left top] (get-native-position el range)]
+            [left top])
+          [left-index top-index])]
+    [left top]))
+
+(defn set-position [quill el index range]
+  (let [[left top] (get-position quill el index range)]
     (doseq [[k v] {"top" (str top "px")
                    "left" (str left "px")}]
       (aset (.-style el) k v))))

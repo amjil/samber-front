@@ -10,7 +10,7 @@
   (:import
    [goog.async Debouncer]))
 
-(defn- touch-start [e ql-editor is-long? timer hide-fn]
+(defn- touch-start [quill e ql-editor is-long? timer hide-fn]
   ; (.preventDefault e)
   (let [caret-div (js/document.getElementById "caret-position-div")
         caret-display (if caret-div (aget (.-style caret-div) "display"))]
@@ -18,12 +18,10 @@
       (aset (.-style caret-div) "display" "block"))
     (let [location (aget (.-touches e) 0)
           range (js/document.caretRangeFromPoint (.-clientX location) (.-clientY location))
-          quill @(subscribe [:quill])
           cloned-range (.cloneRange range)
-          selection-index (+ (.-startOffset cloned-range) (.getIndex quill (.find Quill (.-startContainer cloned-range))))]
-      (.setSelection quill selection-index 0)
-      (js/console.log (.getSelection quill))
-      (caret/set-position caret-div range)
+          selection-index (+ (.-startOffset cloned-range) (.getIndex @quill (.find Quill (.-startContainer cloned-range))))]
+      (.setSelection @quill selection-index 0)
+      (caret/set-position quill caret-div selection-index range)
       (when (and @timer (> 1000 (- (.valueOf (dayjs)) @timer)))
         (.fire hide-fn)
         ; (caret/selection-caret hide-fn)
@@ -88,7 +86,7 @@
         onselect-fn (Debouncer. #(onselect el this is-long? long-press-timer) 1000)]
     (.addEventListener el "touchstart"
       (fn [e]
-        (touch-start e el is-long? long-press-timer hide-fn)
+        (touch-start this e el is-long? long-press-timer hide-fn)
         (.fire onselect-fn)))
     (.addEventListener el "touchmove"
       (fn [e] (touch-move e is-long?)))
@@ -108,4 +106,4 @@
       (fn [e]
         (js/console.log "selectchange ....")))
 
-    (caret/create-caret (.-parentNode el) hide-fn)))
+    (caret/create-caret this (.-parentNode el) hide-fn)))

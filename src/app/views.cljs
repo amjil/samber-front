@@ -8,7 +8,7 @@
             [app.components.login :as login]
             [app.components.editor :as editor]
             [app.components.hammer :as hammer]
-            [app.components.keyboard :as keyboard]))
+            [app.components.keyboard.keyboard :as keyboard]))
 
 (defn pages [page-name]
   (case page-name

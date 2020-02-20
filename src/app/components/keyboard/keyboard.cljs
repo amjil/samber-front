@@ -1,4 +1,4 @@
-(ns app.components.keyboard)
+(ns app.components.keyboard.keyboard)
 
 (defn eng-board []
   (fn []

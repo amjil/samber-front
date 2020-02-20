@@ -10,7 +10,7 @@
      [app.components.long-tap :as long-tap]
      [app.components.range-selection :as range-selection]
      [app.components.context-menu :as context-menu]
-     [app.components.keyboard :as keyboard]
+     [app.components.keyboard.keyboard :as keyboard]
      ["react-hammerjs" :default Hammer]
      ["dayjs" :as dayjs])
     (:import
@@ -117,6 +117,6 @@
                              (println (str "text changed: " %2))
                              (let [quill @(subscribe [:quill])]
                                (js/console.log "xxxxxx")
-                               (js/console.log (.getSelection quill)))))}]]]))
-       ; [:div.simple-keyboard-wrapper
-       ;  [keyboard/nine-layout-board]]]))
+                               (js/console.log (.getSelection quill)))))}]]
+       [:div.simple-keyboard-wrapper
+        [keyboard/nine-layout-board]]]))

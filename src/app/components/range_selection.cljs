@@ -35,17 +35,18 @@
         range (js/document.createRange)]
     (.setEnd range (.-domNode blot) offset)
     (.setStart range (.-domNode blot) offset)
-    (caret/set-position el range)))
+    (caret/set-position quill el selection-index range)))
 
 (defn set-quill-selection [quill el type selection-index q-range]
   (let [quill-range (.getSelection @quill)]
+    (js/console.log "quill range = " quill-range)
     (if (= type 1)
       (if (>= selection-index (+ (.-index @q-range) (.-length @q-range)))
         (let [select-text (.getText @quill selection-index 30)
               text-list (str/split select-text #"\s")
               sel-end (if (or (str/starts-with? select-text " ") (empty? (first text-list)))
                           1
-                          (count (first (str/split select-text #"\s"))))]
+                          (count (first text-list)))]
           (.setSelection @quill selection-index sel-end)
           (set-range quill (.querySelector (.-parentNode el) "#selection-end-div") (+ selection-index sel-end)))
         (do
@@ -71,11 +72,19 @@
         moved-y (.-clientY moved)
         range (js/document.caretRangeFromPoint moved-x moved-y)
         start-el (.-startContainer range)
-        start-offset (.-startOffset range)]
+        start-offset (.-startOffset range)
+        selection-index (+ start-offset (.getIndex @quill (.find Quill start-el)))]
+    (js/console.log "move border event" e)
+    (js/console.log moved-x moved-y)
+    (js/console.log (= selection-index (.-index @q-range)))
     (if (nil? (.find Quill start-el))
-      (js/console.log "sorry 11!!!" (.getSelection @quill))
+      (do
+        (js/console.log "sorry 11!!!" (.getSelection @quill) @q-range))
+        ; (when @q-range
+        ;   (js/console.log "reseting ........")
+        ;   (.setSelection @quill (.-index @q-range) (.-length @q-range))))
       (let [
-            selection-index (+ start-offset (.getIndex @quill (.find Quill start-el)))
+            ; selection-index (+ start-offset (.getIndex @quill (.find Quill start-el)))
             [left top] (position range)
             ;;;
 
@@ -92,9 +101,8 @@
         ; (caret/set-position (.-target e) range)
         (aset (.-style range-el) "left" (str left-index "px"))
         (aset (.-style range-el) "top" (str top-index "px"))
-        (js/console.log "<<<<<<<<<<" selection-index "-" start-offset)
+        (js/console.log "<<<<<<<<<<" selection-index "-<><>" start-offset)
         ; (js/console.log quill-range)
-        (js/console.log @q-range)
         ;;
         ; (if (= type 1)
         ;   (do
@@ -103,6 +111,7 @@
         ;       (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index))))
         ;   (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range))))
         (set-quill-selection quill range-el type selection-index q-range)
+        (js/console.log (.getSelection @quill))
         (reset! q-range (.getSelection @quill))))
     ;;
     (js/console.log "move caret .....")))
