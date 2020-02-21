@@ -19,6 +19,6 @@
       (let [ele (js/document.createElement "div")]
         (set! (.-innerHTML ele) x)
         (.appendChild div ele)))
-    ; (aset (.-style div) "display" "block")
+    (aset (.-style div) "display" "none")
 
     (.appendChild el div)))

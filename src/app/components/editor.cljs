@@ -2,6 +2,7 @@
     (:require
      [reagent.core :as r]
      ["quill" :as quill]
+     [app.components.atom :refer [quill-editor]]
      [re-frame.core :refer [subscribe dispatch]]
      [app.components.tabbar :as tabbar]
      [app.components.navbar :as navbar]
@@ -11,20 +12,22 @@
      [app.components.range-selection :as range-selection]
      [app.components.context-menu :as context-menu]
      [app.components.keyboard.keyboard :as keyboard]
+     [app.components.keyboard.candidate :as candidate]
      ["react-hammerjs" :default Hammer]
      ["dayjs" :as dayjs])
     (:import
      [goog.async Debouncer]))
 
   (defn editor [{:keys [id content selection on-change-fn]}]
-    (let [this (r/atom nil)
-          value #(aget @this "container" "firstChild" "innerHTML")
+    (let [;this (r/atom nil)
+          value #(aget @quill-editor "container" "firstChild" "innerHTML")
+          ; value #(aget @this "container" "firstChild" "innerHTML")
           last-tap-time (r/atom nil)
           hide-selection (Debouncer. caret/selection-caret-hide 2000)]
       (r/create-class
        {:component-did-mount
         (fn [component]
-          (reset! this
+          (reset! quill-editor
                   (quill.
                    (aget (.-children (r/dom-node component)) 0)
                    #js {
@@ -34,28 +37,27 @@
                         ; :debug "info"
                         :placeholder "11Compose an epic..."}))
 
-          (.on @this "text-change"
+          (.on @quill-editor "text-change"
                (fn [delta old-delta source]
-                 (on-change-fn source (value))))
+                 (on-change-fn source (aget @quill-editor "container" "firstChild" "innerHTML"))))
 
           (if (= selection nil)
-            (.setSelection @this nil)
-            (.setSelection @this (first selection) (second selection) "api"))
+            (.setSelection @quill-editor nil)
+            (.setSelection @quill-editor (first selection) (second selection) "api"))
 
           (let [ql-clipboard (js/document.querySelector ".ql-clipboard")]
             (aset (.-style ql-clipboard) "visibility" "hidden"))
 
           (let [ql-editor (js/document.querySelector ".ql-editor")]
-            (long-tap/index ql-editor this))
+            (long-tap/index ql-editor quill-editor))
 
           (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
-            (range-selection/create-range this my-editor 1)
-            (range-selection/create-range this my-editor 2)
+            (range-selection/create-range quill-editor my-editor 1)
+            (range-selection/create-range quill-editor my-editor 2)
             (context-menu/create-element my-editor))
 
           ; (new BScroll ".ql-editor" #js {})
-
-          (dispatch [:set-quill @this]))
+          (dispatch [:set-quill @quill-editor]))
 
         :component-will-receive-props
         (fn [component next-props]
@@ -65,9 +67,9 @@
                (not= (:id (r/props component)) (:id (second next-props))))
             (do
               (if (= selection nil)
-                (.setSelection @this nil)
-                (.setSelection @this (first selection) (second selection) "api"))
-              (.pasteHTML @this (:content (second next-props))))))
+                (.setSelection @quill-editor nil)
+                (.setSelection @quill-editor (first selection) (second selection) "api"))
+              (.pasteHTML @quill-editor (:content (second next-props))))))
 
         :display-name  (str "quill-editor-" id)
 
@@ -81,10 +83,11 @@
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
                   :style {:width "100%"
+
+                          :height "100%"
                           :position "relative"
                           :padding-top "1px"
                           ; :overflow "auto"
-                          ; :user-select "none"}
                           :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
 
@@ -97,20 +100,13 @@
                       :padding ".7rem"
                       :overflow-y "hidden"
                       :width "100vw"}}
-        ; [qeditor/editor
         [editor
          {:id "my-editor-id"
           :content
           (str  "welcome to reagent-quill!<br>"
                 "aaaaa<br>"
                 "bbbbb<br>"
-                "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ <br>"
-                "ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠬᠤᠷᠠᠭ᠎ᠠ ᠬᠣᠶᠠᠷ ᠬᠦᠴᠦᠨ ᠪᠠᠭᠤᠷᠠᠢ ᠨᠢ ᠬᠦᠴᠦᠲᠡᠨ ᠤ ᠳᠡᠷᠭᠡᠲᠡ ᠬᠡᠵᠢᠶᠡᠲᠡ ᠵᠥᠪ ᠢᠶᠡᠨ ᠣᠯᠳᠠᠭ ᠦᠭᠡᠢ ᠦᠯᠢᠭᠡᠷ ᠵᠢᠱᠢᠶ᠎ᠡ ᠲᠡᠦᠬᠡ ᠱᠠᠰᠲᠢᠷ ᠲᠤ ᠣᠯᠠᠨ ᠪᠠᠢ᠌ᠳᠠᠭ᠂ ᠭᠡᠪᠡᠴᠦ ᠪᠢ ᠡᠨᠳᠡ ᠲᠡᠦᠬᠡ ᠶᠠᠷᠢᠬᠤ ᠦᠭᠡᠢ᠂ ᠬᠠᠷᠢᠨ ᠡᠨᠡ ᠲᠤᠬᠠᠢ ᠨᠢᠭᠡ ᠶᠣᠭᠲᠠ ᠦᠯᠢᠭᠡᠷ ᠶᠠᠷᠢᠶ᠎ᠠ᠃
-ᠨᠢᠭᠡᠨ ᠬᠠᠯᠠᠭᠤᠨ ᠡᠳᠦᠷ ᠬᠤᠷᠠᠭ᠎ᠠ ᠭᠣᠷᠣᠬ᠎ᠠ ᠳᠡᠭᠡᠷ᠎ᠠ ᠤᠰᠤ ᠤᠤᠭᠤᠬᠤ ᠪᠡᠷ ᠣᠴᠢᠭᠠᠳ᠂ ᠭᠠᠢ ᠭᠠᠮᠰᠢᠭ ᠲᠤ ᠤᠴᠠᠷᠠᠬᠤ ᠨᠢ ᠭᠠᠷᠴᠠᠭ᠎ᠠ ᠦᠭᠡᠢ ᠪᠣᠯᠪᠠ᠂ ᠤᠴᠢᠷ ᠨᠢ ᠲᠡᠭᠦᠪᠡᠷ ᠨᠢᠭᠡ ᠦᠯᠦᠨ ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠢᠳᠡᠰᠢ ᠬᠠᠢ᠌ᠨ ᠦᠯᠪᠡᠯᠵᠡᠨ ᠶᠠᠪᠤᠵᠤ ᠪᠠᠢ᠌ᠵᠠᠢ᠃
-ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠬᠤᠷᠠᠭ᠎ᠠ ᠶᠢ ᠦᠵᠡᠭᠡᠳ᠂ ᠲᠡᠷᠡ ᠬᠦ ᠪᠡᠯᠡᠨ ᠬᠣᠭᠣᠯᠠ ᠤᠷᠤᠭᠤ ᠤᠬᠤᠰᠭᠢᠨ ᠬᠦᠷᠥᠯ᠎ᠡ᠃ ᠭᠡᠪᠡᠴᠦ ᠲᠡᠭᠦᠨ ᠢ ᠢᠳᠡᠬᠦ ᠳ᠋ᠤ ᠪᠠᠨ ᠤᠴᠢᠷ ᠰᠢᠯᠲᠠᠭᠠᠨ ᠭᠠᠷᠭᠠᠬᠤ ᠶᠢᠨ ᠲᠦᠯᠦᠭᠡ:
-《 ᠬᠦᠶᠢ᠋᠂ ᠴᠢ ᠮᠠᠭᠤ ᠨᠢᠭᠤᠷ ᠦᠭᠡᠢ ᠠᠮᠢᠲᠠᠨ᠂ ᠶᠠᠭᠤ ᠭᠡᠵᠦ ᠪᠣᠵᠠᠷ ᠬᠣᠩᠰᠢᠶᠠᠷ ᠢᠶᠡᠷ ᠢᠶᠡᠨ ᠮᠢᠨᠦ ᠡᠨᠳᠡᠬᠢ ᠠᠷᠢᠭᠤᠨ ᠤᠮᠳᠠᠭᠠᠨ ᠢ ᠰᠢᠪᠠᠷ ᠱᠠᠪᠠᠬᠠᠢ ᠪᠡᠷ ᠪᠣᠯᠠᠩᠬᠢᠷᠲᠤᠭᠤᠯᠪᠠ᠂ ᠴᠢᠨᠦ ᠡᠨᠡ ᠬᠦ ᠬᠡᠷᠴᠡᠭᠡᠢ ᠪᠠᠯᠠᠮᠠᠳ ᠠᠵᠢᠯᠯᠠᠭᠠᠨ ᠤ ᠬᠠᠷᠢᠭᠤ ᠳ᠋ᠤ ᠪᠢ ᠪᠠᠭᠠᠯᠵᠠᠭᠤᠷ ᠢ ᠴᠢᠨᠢ ᠲᠠᠰᠤ ᠬᠠᠵᠠᠨ᠎ᠠ》 ᠭᠡᠵᠦ ᠵᠠᠩᠳᠤᠷᠤᠨ ᠬᠡᠯᠡᠪᠡ᠃"
-                "<br>"
-                "ᠶᠠᠮᠠᠷ ᠨᠢᠭᠡᠨ ᠶᠠᠪᠤᠳᠠᠯ ᠢ ᠳᠠᠭᠤᠷᠢᠶᠠᠨ ᠰᠤᠷᠬᠤ ᠳ᠋ᠤ ᠪᠠᠨ ᠤᠶᠤᠨ ᠤᠬᠠᠭᠠᠨ  ᠢᠶᠡᠨ ᠬᠡᠷᠭ᠍ᠯᠡᠪᠡᠯ ᠠᠰᠢᠭ ᠲᠤᠰᠠ ᠣᠯᠵᠤ ᠴᠢᠳᠠᠨ᠎ᠠ᠂ ᠬᠡᠷᠪᠡ ᠰᠣᠬᠣᠷ ᠪᠠᠯᠠᠢ ᠪᠡᠷ ᠳᠠᠭᠤᠷᠢᠶᠠᠨ ᠰᠤᠷᠪᠠᠯ᠂ ᠪᠣᠷᠬᠠᠨ ᠡ᠂ ᠶᠠᠮᠠᠷ ᠴᠦ ᠤᠴᠠᠷᠠᠵᠤ ᠮᠡᠳᠡᠨ᠎ᠡ ᠰᠢᠦ! ᠪᠢ ᠡᠨᠡ ᠲᠠᠯ᠎ᠠ ᠪᠡᠷ ᠠᠯᠤᠰ ᠣᠷᠣᠨ ᠳ᠋ᠤ ᠪᠣᠯᠣᠭᠰᠠᠨ ᠨᠢᠭᠡᠨ ᠶᠠᠪᠤᠳᠠᠯ ᠢᠶᠡᠨ ᠵᠢᠱᠢᠶ᠎ᠡ ᠲᠠᠲᠠᠵᠤ ᠶᠠᠷᠢᠶ᠎ᠠ᠃ ᠰᠠᠷᠮᠠᠭᠴᠢᠨ ᠢ ᠣᠯᠵᠤ ᠦᠵᠡᠭ᠍ᠰᠡᠨ ᠬᠦᠮᠦᠨ ᠪᠦᠬᠦᠨ ᠲᠡᠳᠡᠨ ᠤ ᠬᠦᠮᠦᠨ ᠳᠠᠭᠤᠷᠢᠶᠠᠬᠤ ᠵᠠᠩᠲᠠᠢ ᠶᠢ ᠮᠡᠳᠡᠨ᠎ᠡ᠃ ᠠᠹᠠᠷᠢᠺᠠ ᠲᠢᠪ ᠤᠨ ᠥᠳᠬᠡᠨ ᠤᠢ ᠰᠢᠭᠤᠢ ᠳᠣᠲᠣᠷ᠎ᠠ᠂ ᠮᠣᠳᠣᠨ ᠤ ᠰᠠᠯᠠᠭ᠎ᠠ ᠮᠦᠴᠢᠷ ᠳᠡᠭᠡᠭᠦᠷ ᠰᠦᠷᠥᠭ᠌ ᠰᠠᠷᠮᠠᠭᠴᠢᠨ ᠰᠠᠭᠤᠵᠠᠭᠠᠵᠤ ᠪᠠᠢᠵᠠᠢ᠃ ᠲᠡᠳᠡ ᠳᠣᠷᠣᠭᠰᠢ ᠬᠠᠷᠠᠵᠤ ᠦᠵᠡᠲᠡᠯ᠎ᠡ᠂ ᠰᠠᠷᠮᠠᠭᠴᠢᠨ ᠪᠠᠷᠢᠬᠤ ᠬᠦᠮᠦᠨ᠂ ᠡᠪᠡᠰᠦ ᠨᠣᠭᠣᠭᠠᠨ ᠳᠡᠭᠡᠷ᠎ᠠ ᠲᠣᠣᠷ ᠳᠡᠯᠭᠡᠵᠦ᠂ ᠳᠡᠭᠡᠭᠦᠷ ᠨᠢ ᠥᠩᠭᠥᠷᠢᠨ ᠬᠦᠷᠪᠡᠵᠦ ᠪᠠᠢᠯ᠎ᠠ᠃ ᠲᠡᠭᠡᠭᠡᠳ ᠲᠡᠳᠡ ᠪᠡᠶ᠎ᠡ ᠪᠡᠶ᠎...")
+                "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ")
           :selection nil
           :on-change-fn #(if (= % "user")
                            (do
@@ -119,4 +115,6 @@
                                (js/console.log "xxxxxx")
                                (js/console.log (.getSelection quill)))))}]]
        [:div.simple-keyboard-wrapper
-        [keyboard/nine-layout-board]]]))
+        (let [quill (subscribe [:quill])]
+          [keyboard/nine-layout-board quill])]
+       [candidate/view]]))

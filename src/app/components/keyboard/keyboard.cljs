@@ -1,4 +1,7 @@
-(ns app.components.keyboard.keyboard)
+(ns app.components.keyboard.keyboard
+  (:require
+    [app.components.keyboard.key-action :as key-action]
+    [app.components.atom :as aa]))
 
 (defn eng-board []
   (fn []
@@ -104,37 +107,45 @@
        [:div {:style {:display "flex" :flex-direction "column" :margin "0 1px 4px 1px"}}
         [:div.hg-button.hg-standardBtn [:span "1"]]
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "abc")}
           [:span "2"]
           [:span "ABC"]]]
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "def")}
           [:span "3"]
           [:span "DEF"]]]]
        [:div {:style {:display "flex" :flex-direction "column" :margin "0 1px 4px 1px"}}
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "ghi")}
           [:span "4"]
           [:span "GHI"]]]
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "jkl")}
           [:span "5"]
           [:span "JKL"]]]
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "mno")}
           [:span "6"]
           [:span "MNO"]]]]
        [:div {:style {:display "flex" :flex-direction "column" :margin "0 1px 4px 1px"}}
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "pqrs")}
           [:span "7"]
           [:span "PQRS"]]]
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "tuv")}
           [:span "8"]
           [:span "TUV"]]]
         [:div.hg-button.hg-standardBtn
-         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}}
+         [:div {:style {:display "flex" :flex-direction "row" :align-items "center" :font-size "12px"}
+                :on-click #(key-action/on-key "wxyz")}
           [:span "9"]
           [:span "WXYZ"]]]]
        [:div {:style {:display "flex" :flex-direction "column" :margin "0 1px 0 1px"}}
@@ -145,13 +156,18 @@
       [:div {:style {:flex-grow "1" :height "9.56rem" :margin-left "2px"
                                :display "flex" :flex-direction "row"}}
        [:div.hg-row {:style {:flex-grow "1"}}
-        [:div.hg-button {:style {:height "100%"}}
-         [:span "⌫"]]]
+        [:div.hg-button {:style {:height "100%"}
+                         :on-click #(key-action/on-delete)}
+         [:span  "⌫"]]]
        [:div.hg-row {:style {:flex-grow "1"}}
-        [:div.hg-button {:style {:height "100%"}}
+        [:div.hg-button {:style {:height "100%"}
+                         :on-click #(key-action/on-clear)}
          [:span "☐"]]]
        [:div.hg-row {:style {:flex-grow "2.55"}}
-        [:div.hg-button {:style {:height "100%"}}
+        [:div.hg-button {:style {:height "100%"}
+                         :on-click #(do
+                                      (js/console.log (clj->js @aa/key-list))
+                                      (js/console.log (clj->js @aa/cand-list)))}
          [:span "←"]]]]]]))
 
 

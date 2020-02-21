@@ -45,13 +45,17 @@
         (js/console.log "scroll ....")))
 
     (.add (.-classList dot-span) "dot")
+    (aset (.-style dot-span) "display" "none")
     (.appendChild div dot-span)
     (set! (.-id div) "caret-position-div")
+    (aset (.-style div) "display" "none")
     (.appendChild el div)))
 
 (defn get-native-position [el range]
   (let [cloned-range (.cloneRange range)
         shadow-caret (js/document.createTextNode "|")]
+    ; (.insertNode cloned-range shadow-caret)
+    ; (.selectNode cloned-range shadow-caret)
     (if (> (- (.-endOffset range) 1) 0)
       (do
         (.setStart cloned-range (.-endContainer range) (- (.-endOffset range) 1))
@@ -77,12 +81,20 @@
         [left-index (- y (.-offsetTop parent-el))]))))
 
 (defn get-position [quill el index range]
-  (let [[blot offset] (.getLeaf @quill index)
-        bound (.getBounds @quill index offset)
+  (js/console.log "get-position" (.getSelection @quill))
+  (js/console.log (.-startOffset range))
+  ; (let [[left top] (get-native-position el range)]
+  ;   [left top]))
+  (let [
+        [blot offset] (.getLeaf @quill index)
+        flag (and (= 3 (.-nodeType (.-domNode blot))) (= offset (.-length (.-domNode blot))))
+        index (if flag (- index 1) index)
+        bound (.getBounds @quill index 1)
+        _ (js/console.log "bound" bound)
         left-index (.-left bound)
-        top-index (.-top bound)
+        top-index (if flag (.-bottom bound) (.-top bound))
         [left top]
-        (if (<= top-index 1)
+        (if (<= top-index 0)
           (let [[left top] (get-native-position el range)]
             [left top])
           [left-index top-index])]
@@ -94,7 +106,17 @@
                    "left" (str left "px")}]
       (aset (.-style el) k v))))
 
+(defn set-range [quill selection-index]
+  (let [el (js/document.getElementById "caret-position-div")
+        [blot offset] (.getLeaf @quill selection-index)
+        range (js/document.createRange)]
+    (js/console.log "<<<< set-range " selection-index)
+    (.setEnd range (.-domNode blot) offset)
+    (.setStart range (.-domNode blot) offset)
+    (set-position quill el selection-index range)))
+
 (defn selection-caret-hide []
+  (js/console.log "selection caret hide .....")
   (let [caret-div (js/document.getElementById "caret-position-div")
         dot-span (.querySelector caret-div ".dot")]
     (aset (.-style dot-span) "display" "none")))

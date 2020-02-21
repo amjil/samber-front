@@ -20,8 +20,12 @@
           range (js/document.caretRangeFromPoint (.-clientX location) (.-clientY location))
           cloned-range (.cloneRange range)
           selection-index (+ (.-startOffset cloned-range) (.getIndex @quill (.find Quill (.-startContainer cloned-range))))]
+      (js/console.log "native range " range)
       (.setSelection @quill selection-index 0)
+      (js/console.log "selection = " selection-index)
+      (js/console.log (.getSelection @quill))
       (caret/set-position quill caret-div selection-index range)
+      (js/console.log (.getSelection @quill))
       (when (and @timer (> 1000 (- (.valueOf (dayjs)) @timer)))
         (.fire hide-fn)
         ; (caret/selection-caret hide-fn)
