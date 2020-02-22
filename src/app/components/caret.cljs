@@ -104,7 +104,10 @@
   (let [[left top] (get-position quill el index range)]
     (doseq [[k v] {"top" (str top "px")
                    "left" (str left "px")}]
-      (aset (.-style el) k v))))
+      (aset (.-style el) k v))
+    (let [caret-display (aget (.-style el) "display")]
+      (if (and caret-display (= "none" caret-display))
+        (aset (.-style el) "display" "block")))))
 
 (defn set-range [quill selection-index]
   (let [el (js/document.getElementById "caret-position-div")

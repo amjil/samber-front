@@ -24,3 +24,5 @@
   ; (r/track
   ;   (fn []
   ;     (http/candidate @query-list identity))))
+
+(def keyboard-layout (r/atom 1))

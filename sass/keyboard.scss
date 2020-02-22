@@ -153,3 +153,16 @@
   // background-image: url(/images/mountains.jpg);
   background-size: cover;
 }
+
+.simple-keyboard-candidate {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  left: 0;
+  bottom: 182px;
+  width: 100%;
+  padding-top: .2rem;
+  overflow: hidden;
+  box-shadow: 2px -2px 3px #aaaaaa;
+  opacity: .8;
+}

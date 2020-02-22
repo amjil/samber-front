@@ -9,11 +9,15 @@
      [:div.hg-row
       (doall
         (for [i ["q" "w" "e" "r" "t" "y" "u" "i" "o" "p"]]
-          [:div.hg-button.hg-standardBtn [:span i]]))]
+          [:div.hg-button.hg-standardBtn
+           { :on-click #(key-action/on-key i)}
+           [:span i]]))]
      [:div.hg-row {:style {:padding "0 .875rem"}}
       (doall
         (for [i ["a" "s" "d" "f" "g" "h" "j" "k" "l"]]
-          [:div.hg-button.hg-standardBtn [:span i]]))]
+          [:div.hg-button.hg-standardBtn
+           { :on-click #(key-action/on-key i)}
+           [:span i]]))]
      [:div.hg-row
       [:div.hg-button.hg-standardBtn
        {:style {:width "1.4rem"}}
@@ -21,18 +25,29 @@
        ; "⇪"
       (doall
         (for [i [ "z" "x" "c" "v" "b" "n" "m"]]
-          [:div.hg-button.hg-standardBtn [:span i]]))
+          [:div.hg-button.hg-standardBtn
+           { :on-click #(key-action/on-key i)}
+           [:span i]]))
       [:div.hg-button.hg-standardBtn
-       {:style {:width "1.4rem"}}
+       {:style {:width "1.4rem"}
+        :on-click #(key-action/on-delete)}
        [:span "⌫"]]]
      [:div.hg-row
       [:div.hg-button.hg-standardBtn
        [:span "123"]]
       [:div.hg-button.hg-standardBtn
-       {:style {:flex-grow "5"}}
+       {:style {:flex-grow "4"}
+        :on-click #(key-action/on-space)}
        [:span ""]]
       [:div.hg-button.hg-standardBtn
+       { :on-click #(reset! aa/keyboard-layout 2)}
+       [:span "abc"]]
+      [:div.hg-button.hg-standardBtn
+       {:on-click #(key-action/on-clear)}
+       [:span "☐"]]
+      [:div.hg-button.hg-standardBtn
        ; "↩"
+       { :on-click #(key-action/on-return)}
        [:span "↩️"]]]]))
 
 (defn num-board []
@@ -95,9 +110,9 @@
          [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
           [:span {:style {:writing-mode "vertical-lr"}} "᠃"]]
          [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
-          [:span {:style {:writing-mode "vertical-lr"}} "᠄"]]
+          [:span {:style {:writing-mode "vertical-lr"}} "?"]]
          [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
-          [:span {:style {:writing-mode "vertical-lr"}} "᠁"]]]]
+          [:span {:style {:writing-mode "vertical-lr"}} "!"]]]]
        [:div.hg-row {:style {:flex-grow "1"}}
         [:div.hg-button {:style {:height "100%"}}
          [:span "123"]]]]
@@ -149,9 +164,15 @@
           [:span "9"]
           [:span "WXYZ"]]]]
        [:div {:style {:display "flex" :flex-direction "column" :margin "0 1px 0 1px"}}
-        [:div.hg-button.hg-standardBtn [:span "?!"]]
-        [:div.hg-button.hg-standardBtn [:span "⌞⌟"]]
-        [:div.hg-button.hg-standardBtn [:span "abc"]]]]
+        [:div.hg-button.hg-standardBtn
+         [:span {:style {:writing-mode "vertical-lr"}} "?"]
+         [:span {:style {:writing-mode "vertical-lr"}} "!"]]
+        [:div.hg-button.hg-standardBtn
+         {:on-click #(key-action/on-space)}
+         [:span "⌞⌟"]]
+        [:div.hg-button.hg-standardBtn
+         { :on-click #(reset! aa/keyboard-layout 1)}
+         [:span "abc"]]]]
       ; [:div.hg-button {:style {:flex-grow "1" :height "9.56rem" :margin-left "2px"}} [:span "3"]]
       [:div {:style {:flex-grow "1" :height "9.56rem" :margin-left "2px"
                                :display "flex" :flex-direction "row"}}
@@ -165,9 +186,7 @@
          [:span "☐"]]]
        [:div.hg-row {:style {:flex-grow "2.55"}}
         [:div.hg-button {:style {:height "100%"}
-                         :on-click #(do
-                                      (js/console.log (clj->js @aa/key-list))
-                                      (js/console.log (clj->js @aa/cand-list)))}
+                         :on-click #(key-action/on-return)}
          [:span "←"]]]]]]))
 
 

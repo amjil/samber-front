@@ -2,7 +2,7 @@
     (:require
      [reagent.core :as r]
      ["quill" :as quill]
-     [app.components.atom :refer [quill-editor]]
+     [app.components.atom :refer [quill-editor keyboard-layout]]
      [re-frame.core :refer [subscribe dispatch]]
      [app.components.tabbar :as tabbar]
      [app.components.navbar :as navbar]
@@ -35,7 +35,7 @@
                         :theme "snow"
                         :readOnly true
                         ; :debug "info"
-                        :placeholder "11Compose an epic..."}))
+                        :placeholder "ᠠᠭᠤᠯᠭ᠎ᠠ ᠪᠠᠨ ᠨᠠᠢᠷᠠᠭᠤᠯᠤᠶ᠎ᠠ ..."}))
 
           (.on @quill-editor "text-change"
                (fn [delta old-delta source]
@@ -49,7 +49,8 @@
             (aset (.-style ql-clipboard) "visibility" "hidden"))
 
           (let [ql-editor (js/document.querySelector ".ql-editor")]
-            (long-tap/index ql-editor quill-editor))
+            (long-tap/index ql-editor quill-editor)
+            (aset (.-style ql-editor) "white-space" "pre"))
 
           (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
             (range-selection/create-range quill-editor my-editor 1)
@@ -103,10 +104,7 @@
         [editor
          {:id "my-editor-id"
           :content
-          (str  "welcome to reagent-quill!<br>"
-                "aaaaa<br>"
-                "bbbbb<br>"
-                "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ")
+          ""
           :selection nil
           :on-change-fn #(if (= % "user")
                            (do
@@ -115,6 +113,8 @@
                                (js/console.log "xxxxxx")
                                (js/console.log (.getSelection quill)))))}]]
        [:div.simple-keyboard-wrapper
-        (let [quill (subscribe [:quill])]
-          [keyboard/nine-layout-board quill])]
+        (condp = @keyboard-layout
+          1 [keyboard/eng-board]
+          2 [keyboard/nine-layout-board]
+          [keyboard/eng-board])]
        [candidate/view]]))

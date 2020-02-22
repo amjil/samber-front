@@ -151,6 +151,17 @@
     (if-not (= "none" (aget (.-style el-end) "display"))
       (aset (.-style el-end) "display" "none"))))
 
+(defn hide-range []
+  (js/console.log "hide range ....")
+  (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")
+        el-start (.querySelector my-editor "#selection-start-div")
+        el-end (.querySelector my-editor "#selection-end-div")]
+    (if-not (= "none" (aget (.-style el-start) "display"))
+      (aset (.-style el-start) "display" "none"))
+    (if-not (= "none" (aget (.-style el-end) "display"))
+      (aset (.-style el-end) "display" "none"))))
+
+
 (defn index [el quill index type]
   (let [id (if (= 1 type) "#selection-start-div" "#selection-end-div")
         range-el (.querySelector (.-parentNode el) id)]
