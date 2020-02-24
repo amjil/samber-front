@@ -5,7 +5,7 @@
 (defn index []
   (fn []
     (let [active-page @(subscribe [:active-page])
-          back-button-visible? (some #{active-page} [:editor])]
+          back-button-visible? (not= active-page :editor)]
       [:div.van-hairline--top-bottom.van-nav-bar--fixed.van-nav-bar
        {:style {:width "100vw"
                 :overflow "hidden"}}

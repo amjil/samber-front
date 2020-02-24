@@ -1,6 +1,6 @@
 (ns app.components.keyboard.candidate
   (:require [reagent.core :as r]
-            [app.components.atom :refer [quill-editor cand-list key-list]]
+            [app.components.atom :refer [quill-editor cand-list key-list filter-prefix keyboard-layout]]
             [app.components.keyboard.key-action :as key-action]
             [app.components.keyboard.http :as http]))
 
@@ -9,23 +9,46 @@
 (defn view []
   (fn []
     [:div.simple-keyboard-candidate
-     {:style {:opacity "1"}}
+     ; {:style {:opacity "1"}}
      (if-not (empty? @key-list)
-       [:ul {:style {:overflow "auto" :width "100%"
-                     :writing-mode "horizontal-tb"
-                     :display "flex"; :flex-direction "column"}}
-                     :padding-bottom "1rem"}}
-        [:li {:style {:writing-mode "horizontal-tb"
-                        :padding-left ".2rem"}}
-          "["]
-        (for [kk @key-list]
-          ^{:key kk}
-          [:li {:style {:writing-mode "horizontal-tb"
-                        :padding-left ".2rem"}}
-            kk])
-        [:li {:style {:writing-mode "horizontal-tb"
-                        :padding-left ".2rem"}}
-          "]"]])
+       [:div {:style {:overflow "auto" :width "100%"
+                      :writing-mode "horizontal-tb"
+                      :display "flex" :flex-direction "row"}}
+        [:ul {:style {:overflow "auto" :width "100%"
+                      :writing-mode "horizontal-tb"
+                      :display "flex"; :flex-direction "column"}}
+                      :padding-bottom "1rem"}}
+         [:li {:style {:writing-mode "horizontal-tb"
+                         :padding-left ".2rem"}}
+           "["]
+         ; (for [kk @key-list]
+         ;   ^{:key kk}
+         ;   [:li {:style {:writing-mode "horizontal-tb"
+         ;                 :padding-left ".2rem"}}
+         ;     kk])
+         (doall
+           (map-indexed
+             (fn [i x]
+               ^{:key (str i x)}
+               [:li {:style {:writing-mode "horizontal-tb"
+                             :padding-left ".2rem"}}
+                 x])
+            @key-list))
+         [:li {:style {:writing-mode "horizontal-tb"
+                         :padding-left ".2rem"}}
+           "]"]]
+        (if (and (= 2 @keyboard-layout) (> (count @key-list) (count @filter-prefix)))
+          [:ul {:style {:overflow "auto" :width "100%"}}
+           (doall
+             (map-indexed (fn [i x]
+                              ^{:key (str i x)}
+                             [:li {:style {:writing-mode "horizontal-tb"
+                                           :padding-left ".2rem"
+                                           :display "flex" :flex-direction "column"}
+                                   :on-click #(key-action/on-candidate-filter x)}
+                              [:span (inc i)]
+                              [:span (str "." x)]])
+                (map char (nth @key-list (count @filter-prefix)))))])])
      (if-not (empty? @cand-list)
        [:ul {:style {:overflow "auto" :width "100%"
                      :padding-bottom "1rem"

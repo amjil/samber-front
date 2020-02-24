@@ -50,7 +50,7 @@
 
           (let [ql-editor (js/document.querySelector ".ql-editor")]
             (long-tap/index ql-editor quill-editor)
-            (aset (.-style ql-editor) "white-space" "pre"))
+            (aset (.-style ql-editor) "white-space" "pre-wrap"))
 
           (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
             (range-selection/create-range quill-editor my-editor 1)
@@ -112,9 +112,5 @@
                              (let [quill @(subscribe [:quill])]
                                (js/console.log "xxxxxx")
                                (js/console.log (.getSelection quill)))))}]]
-       [:div.simple-keyboard-wrapper
-        (condp = @keyboard-layout
-          1 [keyboard/eng-board]
-          2 [keyboard/nine-layout-board]
-          [keyboard/eng-board])]
+       [keyboard/index]
        [candidate/view]]))

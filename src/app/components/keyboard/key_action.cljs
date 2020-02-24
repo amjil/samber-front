@@ -5,31 +5,6 @@
     [app.components.keyboard.http :as http]
     [app.components.range-selection :as range-selection]))
 
-(defn delete-text [range length]
-  (js/console.log "delete-text " range)
-  (if (pos? (.-index range))
-    (let [ops (.-ops (.deleteText @quill-editor (- (.-index range) 1) 1))]
-      (js/console.log "ops" ops)
-      (if (and (empty? ops) (pos? length))
-        (.deleteText @quill-editor (- (.-index range) 2) 1)))))
-
-(defn on-delete []
-  (let [range (.getSelection @quill-editor)
-        length (.getLength @quill-editor)]
-    (js/console.log "<<<<<<<<<<<<" range)
-    (if (zero? (.-length range))
-      (let [new-index (- (.-index range) 1)]
-        (js/console.log (.getContents @quill-editor))
-        (delete-text range length)
-        (js/console.log (.getContents @quill-editor))
-        ; (.setSelection @quill-editor new-index 0)
-        (caret/set-range quill-editor (.-index (.getSelection @quill-editor))))
-      (do
-        (.deleteText @quill-editor (.-index range) (.-length range))
-        (range-selection/hide-range)
-        (caret/set-range quill-editor (.-index range))))
-    (js/console.log "<<<<<<<<<<<< end" (.getSelection @quill-editor) (.getLength @quill-editor))))
-
 (defn reduce-fn [a b]
   (for [x a y b]
     (str x y)))
@@ -42,6 +17,54 @@
       [""]
       kk)))
 
+(defn delete-text [range length]
+  (js/console.log "delete-text " range)
+  (if (pos? (.-index range))
+    (let [ops (.-ops (.deleteText @quill-editor (- (.-index range) 1) 1))]
+      (js/console.log "ops" ops)
+      (if (and (empty? ops) (pos? length))
+        (.deleteText @quill-editor (- (.-index range) 2) 1)))))
+
+(defn on-delete []
+  (let [range (.getSelection @quill-editor)
+        length (.getLength @quill-editor)]
+    (if-not (empty? @key-list)
+      (do
+        (swap! key-list pop)
+        (let [query-list
+              (if (empty? @filter-prefix)
+                (reduce-query @key-list)
+                (filter #(clojure.string/starts-with? (:bqr_biclg %) @filter-prefix) (reduce-query @key-list)))]
+          (if-not (empty? query-list)
+            (http/candidate query-list #(reset! cand-list %)))))
+      (if-not (empty? @cand-list)
+        (reset! cand-list [])
+        (if (zero? (.-length range))
+          (let [new-index (- (.-index range) 1)]
+            (js/console.log (.getContents @quill-editor))
+            (delete-text range length)
+            (js/console.log (.getContents @quill-editor))
+            ; (.setSelection @quill-editor new-index 0)
+            (caret/set-range quill-editor (.-index (.getSelection @quill-editor))))
+          (do
+            (.deleteText @quill-editor (.-index range) (.-length range))
+            (range-selection/hide-range)
+            (caret/set-range quill-editor (.-index range))))))
+    (js/console.log "<<<<<<<<<<<< end" (.getSelection @quill-editor) (.getLength @quill-editor))))
+
+(defn on-normal-key [value]
+  (js/console.log "on normal key ....")
+  (let [range (.getSelection @quill-editor)]
+    (when range
+      (if (pos? (.-length range))
+        (.deleteText @quill-editor (.-index range) (.-length range)))
+      (.insertText @quill-editor (.-index range) value)
+      (reset! key-list [])
+      (let [new-index (+ (.-index range) (count value))]
+        (.setSelection @quill-editor new-index 0)
+        (caret/set-range quill-editor new-index))))
+  (js/console.log "on normal key end ...."))
+
 (defn on-key [value]
   (swap! key-list conj value)
   ; (if (empty? @key-list)
@@ -52,7 +75,7 @@
   (let [query-list
         (if (empty? @filter-prefix)
           (reduce-query @key-list)
-          (filter #(clojure.string/starts-with? (:bqr_biclg %) @filter-prefix) (reduce-query @key-list)))]
+          (filter #(clojure.string/starts-with? % @filter-prefix) (reduce-query @key-list)))]
     (if-not (empty? query-list)
       (http/candidate query-list #(reset! cand-list %)))))
 
@@ -73,11 +96,22 @@
     (when range
       (if (pos? (.-length range))
         (.deleteText @quill-editor (.-index range) (.-length range)))
-      (.insertText @quill-editor (.-index range) value "api")
+      (.insertText @quill-editor (.-index range) value)
       (reset! key-list [])
       (let [new-index (+ (.-index range) (count value))]
         (.setSelection @quill-editor new-index 0)
         (caret/set-range quill-editor new-index)))))
+
+(defn on-candidate-filter [value]
+  (reset! filter-prefix (str @filter-prefix value))
+  (js/console.log ".......")
+  (let [query-list
+        (if (empty? @filter-prefix)
+          (reduce-query @key-list)
+          (filter #(clojure.string/starts-with? % @filter-prefix) (reduce-query @key-list)))]
+    (js/console.log (clj->js query-list))
+    (if-not (empty? query-list)
+      (http/candidate query-list #(reset! cand-list %)))))
 
 (defn on-return []
   (.focus @quill-editor)

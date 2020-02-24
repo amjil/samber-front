@@ -9,12 +9,14 @@
      [:div.hg-row
       (doall
         (for [i ["q" "w" "e" "r" "t" "y" "u" "i" "o" "p"]]
+          ^{:key i}
           [:div.hg-button.hg-standardBtn
            { :on-click #(key-action/on-key i)}
            [:span i]]))]
      [:div.hg-row {:style {:padding "0 .875rem"}}
       (doall
         (for [i ["a" "s" "d" "f" "g" "h" "j" "k" "l"]]
+          ^{:key i}
           [:div.hg-button.hg-standardBtn
            { :on-click #(key-action/on-key i)}
            [:span i]]))]
@@ -25,6 +27,7 @@
        ; "⇪"
       (doall
         (for [i [ "z" "x" "c" "v" "b" "n" "m"]]
+          ^{:key i}
           [:div.hg-button.hg-standardBtn
            { :on-click #(key-action/on-key i)}
            [:span i]]))
@@ -105,13 +108,17 @@
                                  :min-height "10px"
                                  :overflow "scroll"
                                  :padding "0"}}
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
+         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+                 :on-click #(key-action/on-normal-key "᠂")}
           [:span {:style {:writing-mode "vertical-lr"}} "᠂"]]
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
+         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+                 :on-click #(key-action/on-normal-key "᠃")}
           [:span {:style {:writing-mode "vertical-lr"}} "᠃"]]
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
+         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+                 :on-click #(key-action/on-normal-key "?")}
           [:span {:style {:writing-mode "vertical-lr"}} "?"]]
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}}
+         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+                 :on-click #(key-action/on-normal-key "!")}
           [:span {:style {:writing-mode "vertical-lr"}} "!"]]]]
        [:div.hg-row {:style {:flex-grow "1"}}
         [:div.hg-button {:style {:height "100%"}}
@@ -189,8 +196,15 @@
                          :on-click #(key-action/on-return)}
          [:span "←"]]]]]]))
 
-
 (defn index []
+  (fn []
+    [:div.simple-keyboard-wrapper
+     (condp = @aa/keyboard-layout
+       1 [eng-board]
+       2 [nine-layout-board]
+       [eng-board])]))
+
+(defn index2 []
   (fn []
     [:div.simple-keyboard-wrapper
      [:div.simple-keyboard-preview]
