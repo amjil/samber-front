@@ -26,3 +26,12 @@
   ;     (http/candidate @query-list identity))))
 
 (def keyboard-layout (r/atom 1))
+
+;; input & textarea
+(def input-type (r/atom "textarea"))
+
+(def editor-content (r/atom ""))
+
+(def editor-cursor (r/atom nil))
+
+(def is-editor (r/atom false))

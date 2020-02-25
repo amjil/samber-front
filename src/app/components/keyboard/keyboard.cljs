@@ -3,7 +3,7 @@
     [app.components.keyboard.key-action :as key-action]
     [app.components.atom :as aa]))
 
-(defn eng-board []
+(defn eng-board [type]
   (fn []
     [:div.simple-keyboard.hg-theme-default.mobile-theme.keyboardDefContainer.hg-layout-default
      [:div.hg-row
@@ -50,10 +50,10 @@
        [:span "☐"]]
       [:div.hg-button.hg-standardBtn
        ; "↩"
-       { :on-click #(key-action/on-return)}
+       { :on-click #(if (= "textarea" type) (key-action/on-return))}
        [:span "↩️"]]]]))
 
-(defn num-board []
+(defn num-board [type]
   (fn []
     [:div.simple-keyboard.hg-theme-default.mobile-theme.keyboardDefContainer.hg-layout-default
      [:div.hg-row
@@ -91,7 +91,7 @@
        [:div.hg-button.hg-standardBtn
         [:span "↵"]]]]]))
 
-(defn nine-layout-board []
+(defn nine-layout-board [type]
   (fn []
     [:div.simple-keyboard.hg-theme-default.mobile-theme.keyboardDefContainer.hg-layout-default
      [:div.hg-row {:style {:flex-direction "column"
@@ -122,7 +122,8 @@
           [:span {:style {:writing-mode "vertical-lr"}} "!"]]]]
        [:div.hg-row {:style {:flex-grow "1"}}
         [:div.hg-button {:style {:height "100%"}}
-         [:span "123"]]]]
+         [:span {:style {:width "100%" :text-align "center"}}
+          "123"]]]]
 
       [:div {:style {:display "flex" :flex-direction "row" :flex-grow "4.5"
                      :margin "0 2px"}}
@@ -186,23 +187,25 @@
        [:div.hg-row {:style {:flex-grow "1"}}
         [:div.hg-button {:style {:height "100%"}
                          :on-click #(key-action/on-delete)}
-         [:span  "⌫"]]]
+         [:span
+          {:style {:width "100%" :text-align "center"}}
+          "⌫"]]]
        [:div.hg-row {:style {:flex-grow "1"}}
         [:div.hg-button {:style {:height "100%"}
                          :on-click #(key-action/on-clear)}
          [:span "☐"]]]
        [:div.hg-row {:style {:flex-grow "2.55"}}
         [:div.hg-button {:style {:height "100%"}
-                         :on-click #(key-action/on-return)}
+                         :on-click #(if (= "textarea" type) (key-action/on-return))}
          [:span "←"]]]]]]))
 
-(defn index []
+(defn index [type]
   (fn []
     [:div.simple-keyboard-wrapper
      (condp = @aa/keyboard-layout
-       1 [eng-board]
-       2 [nine-layout-board]
-       [eng-board])]))
+       1 [eng-board type]
+       2 [nine-layout-board type]
+       [eng-board type])]))
 
 (defn index2 []
   (fn []

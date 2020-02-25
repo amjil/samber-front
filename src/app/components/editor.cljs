@@ -2,7 +2,8 @@
     (:require
      [reagent.core :as r]
      ["quill" :as quill]
-     [app.components.atom :refer [quill-editor keyboard-layout]]
+     ["quill-delta-to-html" :refer [QuillDeltaToHtmlConverter]]
+     [app.components.atom :refer [editor-cursor editor-content quill-editor keyboard-layout input-type is-editor]]
      [re-frame.core :refer [subscribe dispatch]]
      [app.components.tabbar :as tabbar]
      [app.components.navbar :as navbar]
@@ -39,6 +40,7 @@
 
           (.on @quill-editor "text-change"
                (fn [delta old-delta source]
+                 (js/console.log "...........<><><><>>")
                  (on-change-fn source (aget @quill-editor "container" "firstChild" "innerHTML"))))
 
           (if (= selection nil)
@@ -92,10 +94,26 @@
                           :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
 
+  (defn hide-editor []
+    (swap! is-editor not)
+    (when (and (some? @editor-cursor) (= reagent.ratom/RAtom (type @editor-cursor)))
+      (if (= "input" @input-type)
+        (reset! @editor-cursor {:content (clojure.string/trim (.getText @quill-editor)) :delta (.getContents @quill-editor)})
+        (let [content (.convert (QuillDeltaToHtmlConverter. (.-ops (.getContents @quill-editor)) {}))]
+          (reset! @editor-cursor {:content content :delta (.getContents @quill-editor)})))))
+
   (defn index []
     (fn []
       [:div {:style {:display "flex" :flex-direction "row"}}
-       [navbar/index]
+       [:div.van-hairline--top-bottom.van-nav-bar--fixed.van-nav-bar
+        {:style {:width "100vw"
+                 :overflow "hidden"}}
+        [:div.van-nav-bar__left
+         {:style {:height "100%"}
+          :on-click #(hide-editor)}
+         [:i.van-icon.van-icon-arrow-left.van-nav-bar__arrow]]
+        [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} ""]]
+       ; [navbar/index]
        [:div {:style {:height "100%"
                       :margin "46px 0 0 0"
                       :padding ".7rem"
@@ -103,14 +121,13 @@
                       :width "100vw"}}
         [editor
          {:id "my-editor-id"
-          :content
-          ""
+          :content ""
           :selection nil
-          :on-change-fn #(if (= % "user")
+          :on-change-fn #(if (= % "api")
                            (do
-                             (println (str "text changed: " %2))
-                             (let [quill @(subscribe [:quill])]
-                               (js/console.log "xxxxxx")
-                               (js/console.log (.getSelection quill)))))}]]
-       [keyboard/index]
+                             (if (= "input" @input-type)
+                               (reset! editor-content (subs %2 3 (- (count %2) 4)))
+                               (reset! editor-content %2))
+                             (println (str "text changed: " %2))))}]]
+       [keyboard/index "input"]
        [candidate/view]]))

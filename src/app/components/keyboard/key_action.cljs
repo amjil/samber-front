@@ -1,7 +1,7 @@
 (ns app.components.keyboard.key-action
   (:require
     [app.components.caret :as caret]
-    [app.components.atom :refer [quill-editor key-list filter-prefix cand-list]]
+    [app.components.atom :refer [quill-editor key-list filter-prefix cand-list input-type]]
     [app.components.keyboard.http :as http]
     [app.components.range-selection :as range-selection]))
 
