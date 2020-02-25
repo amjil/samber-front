@@ -2,7 +2,6 @@
     (:require
      [reagent.core :as r]
      ["quill" :as quill]
-     ["quill-delta-to-html" :refer [QuillDeltaToHtmlConverter]]
      [app.components.atom :refer [editor-cursor editor-content quill-editor keyboard-layout input-type is-editor]]
      [re-frame.core :refer [subscribe dispatch]]
      [app.components.tabbar :as tabbar]
@@ -99,7 +98,7 @@
     (when (and (some? @editor-cursor) (= reagent.ratom/RAtom (type @editor-cursor)))
       (if (= "input" @input-type)
         (reset! @editor-cursor {:content (clojure.string/trim (.getText @quill-editor)) :delta (.getContents @quill-editor)})
-        (let [content (.convert (QuillDeltaToHtmlConverter. (.-ops (.getContents @quill-editor)) {}))]
+        (let [content (aget @quill-editor "container" "firstChild" "innerHTML")]
           (reset! @editor-cursor {:content content :delta (.getContents @quill-editor)})))))
 
   (defn index []

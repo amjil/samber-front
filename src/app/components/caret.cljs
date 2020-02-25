@@ -105,6 +105,7 @@
     (doseq [[k v] {"top" (str top "px")
                    "left" (str left "px")}]
       (aset (.-style el) k v))
+    (.scrollIntoView el)
     (let [caret-display (aget (.-style el) "display")]
       (if (and caret-display (= "none" caret-display))
         (aset (.-style el) "display" "block")))))

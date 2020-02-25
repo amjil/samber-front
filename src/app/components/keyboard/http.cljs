@@ -5,11 +5,11 @@
             [clojure.string :as str]))
 
 
-(def xvlvn-url "http://192.168.1.173:3000/api/candidate")
+(def xvlvn-url "http://localhost:3000/api/candidate")
 
-(def xvlvn-update "http://192.168.1.173:3000/api/update-order")
+(def xvlvn-update "http://localhost:3000/api/update-order")
 
-(def url-next-words "http://192.168.1.173:3000/api/next-words")
+(def url-next-words "http://localhost:3000/api/next-words")
 
 (defn candidate [cands res-func]
   (js/console.log "candidate string " (clj->js cands))

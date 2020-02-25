@@ -5,7 +5,9 @@
     [app.components.editor :as editor]
     [app.components.caret :as caret]
     [app.components.atom :refer [quill-editor editor-content key-list cand-list filter-prefix editor-cursor input-type is-editor]]
-    [reagent.core :as r]))
+    [reagent.core :as r])
+  (:import
+   [goog.async Debouncer]))
 
 (defn change-editor-field [content type]
   (swap! is-editor not)
@@ -19,14 +21,17 @@
   (if (:delta @content)
     (.setContents @quill-editor (.-ops (:delta @content)) {})
     (.setContents @quill-editor [] {}))
-  (let [content-length (.getLength @quill-editor)]
-    (if (pos? content-length)
-      (caret/set-range quill-editor content-length)))
+  (.setSelection @quill-editor (.getLength @quill-editor))
   (js/console.log "-------------- change editor field ending ...."))
+;
+(defn set-caret []
+  (let [editor-range (.getSelection @quill-editor)]
+    (caret/set-range quill-editor (.-index editor-range))))
 
 (defn index []
   (let [title (r/atom {})
-        content (r/atom {})]
+        content (r/atom {})
+        set-caret-fn (Debouncer. set-caret 100)]
     ; (r/create-class
     ;   {:reagent-render
     (js/console.log "<><><><><><><><><")
@@ -45,7 +50,9 @@
            [:div.van-cell__title.van-field__label
             [:span "ᠭᠠᠷᠴᠠᠭ"]]
            [:div.van-cell__value.van-field__value
-            {:on-click #(change-editor-field title "input")}
+            {:on-click #(do
+                          (change-editor-field title "input")
+                          (.fire set-caret-fn))}
             [:div.van-field__body
              [:span
               (if (empty? (:content @title))
@@ -55,10 +62,14 @@
            [:div.van-cell__title.van-field__label
             [:span "ᠠᠭᠤᠯᠭ᠎ᠠ"]]
            [:div.van-cell__value.van-field__value
-            {:on-click #(change-editor-field content "input")}
-            [:div.van-field__body {:style {:width "calc(100vw - 7rem)"}}
+            {:on-click #(do
+                          (change-editor-field content "textarea")
+                          (.fire set-caret-fn))}
+            [:div.van-field__body {:style {:width "calc(100vw - 7rem)"
+                                           :overflow "auto"}}
              [:div
-              {:style {:width "100%" :height "100%" :text-align "left"}
+              {:style {:width "100%" :height "100%" :text-align "left"
+                       :white-space "pre-wrap"}
                :dangerouslySetInnerHTML {:__html (if (empty? (:content @content))
                                                    "Please Enter Text"
                                                    (:content @content))}}]]]]
