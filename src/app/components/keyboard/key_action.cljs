@@ -1,9 +1,10 @@
 (ns app.components.keyboard.key-action
   (:require
     [app.components.caret :as caret]
-    [app.components.atom :refer [quill-editor key-list filter-prefix cand-list input-type]]
+    [app.components.atom :refer [quill-editor editor-cursor key-list filter-prefix cand-list input-type is-editor]]
     [app.components.keyboard.http :as http]
-    [app.components.range-selection :as range-selection]))
+    [app.components.range-selection :as range-selection]
+    [re-frame.core :refer [dispatch]]))
 
 (defn reduce-fn [a b]
   (for [x a y b]
@@ -127,3 +128,16 @@
     (.insertText @quill-editor (.-index range) " " "api")
     (let [new-index (+ (.-index range) 1)]
       (caret/set-range quill-editor new-index))))
+
+(defn on-search []
+  (if (= "search" @input-type)
+    (let [editor-text (clojure.string/trim (.getText @quill-editor))]
+      (when (and (some? @editor-cursor) (= reagent.ratom/RAtom (type @editor-cursor)) (not-empty editor-text))
+        (js/console.log "xxxxxxx")
+        (js/console.log (clj->js @@editor-cursor))
+        (swap! @editor-cursor assoc :content editor-text :delta (.getContents @quill-editor))
+        (js/console.log (clj->js (:search-fn @@editor-cursor)))
+        ((:search-fn @@editor-cursor) editor-text))))
+  (.setContents @quill-editor [] {})
+  (on-clear)
+  (swap! is-editor not))

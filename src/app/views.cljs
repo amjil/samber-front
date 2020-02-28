@@ -9,7 +9,10 @@
             [app.components.editor :as editor]
             [app.components.hammer :as hammer]
             [app.components.keyboard.keyboard :as keyboard]
-            [app.components.article.new :as article-new]))
+            [app.components.article.list :as article-list]
+            [app.components.article.new :as article-new]
+            [app.components.article.show :as article-show]
+            [app.components.article.search :as article-search]))
 
 (defn pages [page-name]
   (case page-name
@@ -22,8 +25,12 @@
                         :on-change-fn #(if (= % "user")
                                          (println (str "text changed: " %2)))}]
     :editor           [editor/index]
+    :article-new      [article-new/index]
+    :article-show     [article-show/index]
+    :article-list     [article-list/index]
+    :article-search   [article-search/index]
     ; [editor/index]))
-    [article-new/index]))
+    [article-list/index]))
 
 (defn app []
   (fn []

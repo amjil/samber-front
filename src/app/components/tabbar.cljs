@@ -13,7 +13,7 @@
               {:id 4 :name "" :icon "setting-o" :on-click #(js/console.log "item 4")}]
         active-index (r/atom 1)]
     (fn []
-      [:div.van-hairline--top-bottom.van-tabbar.van-tabbar--fixed
+      [:div.van-hairline--left.van-tabbar.van-tabbar--fixed
        {:style {:width "100vw"
                 :overflow "hidden"}}
        (doall

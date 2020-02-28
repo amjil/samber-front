@@ -29,9 +29,14 @@
         (:login :settings :home :result
          :description :form
          :editor
-         :quill)
+         :quill
+         :article-new
+         :article-search
+         :article-show)
 
         {:db set-page}
+
+        :article-list {:db set-page :dispatch [:article-list]}
 
         :todo {:db  set-page
                :dispatch [:todos]}))))

@@ -50,8 +50,14 @@
        [:span "☐"]]
       [:div.hg-button.hg-standardBtn
        ; "↩"
-       { :on-click #(if (= "textarea" @aa/input-type) (key-action/on-return))}
-       [:span "↩️"]]]]))
+       { :on-click #(if (= "textarea" @aa/input-type)
+                      (key-action/on-return)
+                      (if (= "search" @aa/input-type)
+                        (key-action/on-search)))}
+       (if (= "search" @aa/input-type)
+         [:span
+          [:i.van-icon.van-icon-search]]
+         [:span "↩️"])]]]))
 
 (defn num-board []
   (fn []
@@ -196,8 +202,14 @@
          [:span "☐"]]]
        [:div.hg-row {:style {:flex-grow "2.55"}}
         [:div.hg-button {:style {:height "100%"}
-                         :on-click #(if (= "textarea" @aa/input-type) (key-action/on-return))}
-         [:span "←"]]]]]]))
+                         :on-click #(if (= "textarea" @aa/input-type)
+                                      (key-action/on-return)
+                                      (if (= "search" @aa/input-type)
+                                        (key-action/on-search)))}
+         (if (= "search" @aa/input-type)
+           [:span
+            [:i.van-icon.van-icon-search]]
+           [:span "←"])]]]]]))
 
 (defn index []
   (fn []

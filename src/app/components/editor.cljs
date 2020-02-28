@@ -95,11 +95,14 @@
 
   (defn hide-editor []
     (swap! is-editor not)
-    (when (and (some? @editor-cursor) (= reagent.ratom/RAtom (type @editor-cursor)))
-      (if (= "input" @input-type)
-        (reset! @editor-cursor {:content (clojure.string/trim (.getText @quill-editor)) :delta (.getContents @quill-editor)})
-        (let [content (aget @quill-editor "container" "firstChild" "innerHTML")]
-          (reset! @editor-cursor {:content content :delta (.getContents @quill-editor)})))))
+    (let [editor-text (clojure.string/trim (.getText @quill-editor))]
+      (when (and (some? @editor-cursor) (= reagent.ratom/RAtom (type @editor-cursor)) (not-empty editor-text))
+        (if (= "input" @input-type)
+          (reset! @editor-cursor {:content editor-text :delta (.getContents @quill-editor)})
+          (let [content (aget @quill-editor "container" "firstChild" "innerHTML")]
+            (reset! @editor-cursor {:content content :delta (.getContents @quill-editor)}))))
+
+      (.setContents @quill-editor [] {})))
 
   (defn index []
     (fn []

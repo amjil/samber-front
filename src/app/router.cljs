@@ -8,7 +8,11 @@
   ["/" {"home"  :home
         "edit"  :edit
         "toast" :toast
-        "login" :login}])
+        "login" :login
+        "article-new" :article-new
+        "article-list" :article-list
+        "article-show" :article-show
+        "article-search" :article-search}])
 
 (defn set-page! [match]
   (swap! app-state assoc :page match))
