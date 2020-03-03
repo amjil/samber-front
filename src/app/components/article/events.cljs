@@ -66,6 +66,12 @@
      :article-http-list [data #(dispatch [:set-articles %])]}))
 
 (rf/reg-event-fx
+  :article-create
+  (fn [{:keys [db]} [_ data]]
+    {:db db
+     :article-http-create [data #(dispatch [:set-active-page :article-list])]}))
+
+(rf/reg-event-fx
   :article-update
   (fn [{:keys [db]} [_ data]]
     {:db db

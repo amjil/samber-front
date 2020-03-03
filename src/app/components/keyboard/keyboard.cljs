@@ -1,6 +1,7 @@
 (ns app.components.keyboard.keyboard
   (:require
     [app.components.keyboard.key-action :as key-action]
+    ; [app.components.keyboard. :as key-action]
     [app.components.atom :as aa]))
 
 (defn eng-board []
@@ -114,16 +115,17 @@
                                  :min-height "10px"
                                  :overflow "scroll"
                                  :padding "0"}}
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
-                 :on-click #(key-action/on-normal-key "᠂")}
-          [:span {:style {:writing-mode "vertical-lr"}} "᠂"]]
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+         [:div {:style {:flex-grow "1" :padding ".5rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+                :on-click #(key-action/on-normal-key "᠂")}
+          [:span {:style {:writing-mode "vertical-lr" :width "100%" :text-align "center"}}
+           "᠂"]]
+         [:div {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
                  :on-click #(key-action/on-normal-key "᠃")}
           [:span {:style {:writing-mode "vertical-lr"}} "᠃"]]
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+         [:div {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
                  :on-click #(key-action/on-normal-key "?")}
           [:span {:style {:writing-mode "vertical-lr"}} "?"]]
-         [:span {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
+         [:div {:style {:flex-grow "1" :padding ".3rem" :width "100%" :border-bottom "0.5px" :border-style "ridge" :text-align "center"}
                  :on-click #(key-action/on-normal-key "!")}
           [:span {:style {:writing-mode "vertical-lr"}} "!"]]]]
        [:div.hg-row {:style {:flex-grow "1"}}
@@ -219,7 +221,7 @@
        2 [nine-layout-board]
        [eng-board])]))
 
-(defn index2 []
+(defn index-only []
   (fn []
     [:div.simple-keyboard-wrapper
      [:div.simple-keyboard-preview]

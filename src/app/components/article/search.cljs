@@ -37,6 +37,7 @@
                [:div.van-field__body
                 {:on-click #(do
                               (arnew/change-editor-field content "search")
+                              (js/console.log "into search .....")
                               (.fire set-caret-fn))}
                 [:span
                  (if (empty? (:content @content))
