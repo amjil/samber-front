@@ -2,54 +2,64 @@
     (:require
      [reagent.core :as r]
      ["quill" :as quill]
+     [app.components.atom :refer [editor-cursor editor-content quill-editor keyboard-layout input-type is-editor]]
      [re-frame.core :refer [subscribe dispatch]]
      [app.components.tabbar :as tabbar]
      [app.components.navbar :as navbar]
      [app.components.quill :as qeditor]
      [app.components.caret :as caret]
-     ["react-hammerjs" :default Hammer]))
+     [app.components.long-tap :as long-tap]
+     [app.components.range-selection :as range-selection]
+     [app.components.context-menu :as context-menu]
+     [app.components.keyboard.keyboard :as keyboard]
+     [app.components.keyboard.candidate :as candidate]
+     ["react-hammerjs" :default Hammer]
+     ["dayjs" :as dayjs])
+    (:import
+     [goog.async Debouncer]))
 
   (defn editor [{:keys [id content selection on-change-fn]}]
-    (let [this (r/atom nil)
-          value #(aget @this "container" "firstChild" "innerHTML")]
+    (let [;this (r/atom nil)
+          value #(aget @quill-editor "container" "firstChild" "innerHTML")
+          ; value #(aget @this "container" "firstChild" "innerHTML")
+          last-tap-time (r/atom nil)
+          hide-selection (Debouncer. caret/selection-caret-hide 2000)]
       (r/create-class
        {:component-did-mount
         (fn [component]
-          (reset! this
+          (reset! quill-editor
                   (quill.
                    (aget (.-children (r/dom-node component)) 0)
                    #js {
                         :modules #js {:toolbar false}
                         :theme "snow"
                         :readOnly true
-                        :placeholder "11Compose an epic..."}))
+                        ; :debug "info"
+                        :placeholder "ᠠᠭᠤᠯᠭ᠎ᠠ ᠪᠠᠨ ᠨᠠᠢᠷᠠᠭᠤᠯᠤᠶ᠎ᠠ ..."}))
 
-          (.on @this "text-change"
+          (.on @quill-editor "text-change"
                (fn [delta old-delta source]
-                 (on-change-fn source (value))))
+                 (js/console.log "...........<><><><>>")
+                 (on-change-fn source (aget @quill-editor "container" "firstChild" "innerHTML"))))
 
           (if (= selection nil)
-            (.setSelection @this nil)
-            (.setSelection @this (first selection) (second selection) "api"))
+            (.setSelection @quill-editor nil)
+            (.setSelection @quill-editor (first selection) (second selection) "api"))
 
           (let [ql-clipboard (js/document.querySelector ".ql-clipboard")]
             (aset (.-style ql-clipboard) "visibility" "hidden"))
 
           (let [ql-editor (js/document.querySelector ".ql-editor")]
-            (.addEventListener ql-editor
-              "click"
-              (fn [e]
-                (caret/index (.getRangeAt (js/window.getSelection) 0)))))
+            (long-tap/index ql-editor quill-editor)
+            (aset (.-style ql-editor) "white-space" "pre-wrap"))
 
-          (let [editor-wrap (js/document.getElementById "quill-editor-my-editor-id")]
-            (.addEventListener editor-wrap
-              "scroll"
-              (fn [e]
-                (let [caret-div (js/document.getElementById "caret-position-div")]
-                  (if caret-div
-                    (caret/index (.getRangeAt (js/window.getSelection) 0)))))))
+          (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
+            (range-selection/create-range quill-editor my-editor 1)
+            (range-selection/create-range quill-editor my-editor 2)
+            (context-menu/create-element my-editor))
 
-          (dispatch [:set-quill @this]))
+          ; (new BScroll ".ql-editor" #js {})
+          (dispatch [:set-quill @quill-editor]))
 
         :component-will-receive-props
         (fn [component next-props]
@@ -59,9 +69,9 @@
                (not= (:id (r/props component)) (:id (second next-props))))
             (do
               (if (= selection nil)
-                (.setSelection @this nil)
-                (.setSelection @this (first selection) (second selection) "api"))
-              (.pasteHTML @this (:content (second next-props))))))
+                (.setSelection @quill-editor nil)
+                (.setSelection @quill-editor (first selection) (second selection) "api"))
+              (.pasteHTML @quill-editor (:content (second next-props))))))
 
         :display-name  (str "quill-editor-" id)
 
@@ -71,39 +81,55 @@
                  :style {:width "100%"
                          :display "flex"
                          :flex-direction "row"}}
+                         ; :overflow "hidden"}}
            [:div {:id (str "quill-editor-" id)
                   :class "quill-editor"
-                  :style {:overflow-y "auto"
-                          :width "100%"}
+                  :style {:width "100%"
+
+                          :height "100%"
+                          :position "relative"
+                          :padding-top "1px"
+                          ; :overflow "auto"
+                          :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
+
+  (defn hide-editor []
+    (swap! is-editor not)
+    (let [editor-text (clojure.string/trim (.getText @quill-editor))]
+      (when (and (some? @editor-cursor) (= reagent.ratom/RAtom (type @editor-cursor)) (not-empty editor-text))
+        (if (= "input" @input-type)
+          (reset! @editor-cursor {:content editor-text :delta (.getContents @quill-editor)})
+          (let [content (aget @quill-editor "container" "firstChild" "innerHTML")]
+            (reset! @editor-cursor {:content content :delta (.getContents @quill-editor)}))))
+
+      (.setContents @quill-editor [] {})))
 
   (defn index []
     (fn []
       [:div {:style {:display "flex" :flex-direction "row"}}
-       [navbar/index]
+       [:div.van-hairline--top-bottom.van-nav-bar--fixed.van-nav-bar
+        {:style {:width "100vw"
+                 :overflow "hidden"}}
+        [:div.van-nav-bar__left
+         {:style {:height "100%"}
+          :on-click #(hide-editor)}
+         [:i.van-icon.van-icon-arrow-left.van-nav-bar__arrow]]
+        [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} ""]]
+       ; [navbar/index]
        [:div {:style {:height "100%"
                       :margin "46px 0 0 0"
                       :padding ".7rem"
                       :overflow-y "hidden"
                       :width "100vw"}}
-        ; [qeditor/editor
         [editor
          {:id "my-editor-id"
-          :content
-          (str  "welcome to reagent-quill!<br>"
-                "aaaaa<br>"
-                "bbbbb<br>"
-                "ᠠᠳᠤᠭᠤ᠂ ᠬᠡᠰᠡᠭ ᠪᠣᠰᠤᠭ <br>"
-                "ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠬᠤᠷᠠᠭ᠎ᠠ ᠬᠣᠶᠠᠷ ᠬᠦᠴᠦᠨ ᠪᠠᠭᠤᠷᠠᠢ ᠨᠢ ᠬᠦᠴᠦᠲᠡᠨ ᠤ ᠳᠡᠷᠭᠡᠲᠡ ᠬᠡᠵᠢᠶᠡᠲᠡ ᠵᠥᠪ ᠢᠶᠡᠨ ᠣᠯᠳᠠᠭ ᠦᠭᠡᠢ ᠦᠯᠢᠭᠡᠷ ᠵᠢᠱᠢᠶ᠎ᠡ ᠲᠡᠦᠬᠡ ᠱᠠᠰᠲᠢᠷ ᠲᠤ ᠣᠯᠠᠨ ᠪᠠᠢ᠌ᠳᠠᠭ᠂ ᠭᠡᠪᠡᠴᠦ ᠪᠢ ᠡᠨᠳᠡ ᠲᠡᠦᠬᠡ ᠶᠠᠷᠢᠬᠤ ᠦᠭᠡᠢ᠂ ᠬᠠᠷᠢᠨ ᠡᠨᠡ ᠲᠤᠬᠠᠢ ᠨᠢᠭᠡ ᠶᠣᠭᠲᠠ ᠦᠯᠢᠭᠡᠷ ᠶᠠᠷᠢᠶ᠎ᠠ᠃
-ᠨᠢᠭᠡᠨ ᠬᠠᠯᠠᠭᠤᠨ ᠡᠳᠦᠷ ᠬᠤᠷᠠᠭ᠎ᠠ ᠭᠣᠷᠣᠬ᠎ᠠ ᠳᠡᠭᠡᠷ᠎ᠠ ᠤᠰᠤ ᠤᠤᠭᠤᠬᠤ ᠪᠡᠷ ᠣᠴᠢᠭᠠᠳ᠂ ᠭᠠᠢ ᠭᠠᠮᠰᠢᠭ ᠲᠤ ᠤᠴᠠᠷᠠᠬᠤ ᠨᠢ ᠭᠠᠷᠴᠠᠭ᠎ᠠ ᠦᠭᠡᠢ ᠪᠣᠯᠪᠠ᠂ ᠤᠴᠢᠷ ᠨᠢ ᠲᠡᠭᠦᠪᠡᠷ ᠨᠢᠭᠡ ᠦᠯᠦᠨ ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠢᠳᠡᠰᠢ ᠬᠠᠢ᠌ᠨ ᠦᠯᠪᠡᠯᠵᠡᠨ ᠶᠠᠪᠤᠵᠤ ᠪᠠᠢ᠌ᠵᠠᠢ᠃
-ᠴᠢᠨ᠋ᠸ᠎ᠠ ᠬᠤᠷᠠᠭ᠎ᠠ ᠶᠢ ᠦᠵᠡᠭᠡᠳ᠂ ᠲᠡᠷᠡ ᠬᠦ ᠪᠡᠯᠡᠨ ᠬᠣᠭᠣᠯᠠ ᠤᠷᠤᠭᠤ ᠤᠬᠤᠰᠭᠢᠨ ᠬᠦᠷᠥᠯ᠎ᠡ᠃ ᠭᠡᠪᠡᠴᠦ ᠲᠡᠭᠦᠨ ᠢ ᠢᠳᠡᠬᠦ ᠳ᠋ᠤ ᠪᠠᠨ ᠤᠴᠢᠷ ᠰᠢᠯᠲᠠᠭᠠᠨ ᠭᠠᠷᠭᠠᠬᠤ ᠶᠢᠨ ᠲᠦᠯᠦᠭᠡ:
-《 ᠬᠦᠶᠢ᠋᠂ ᠴᠢ ᠮᠠᠭᠤ ᠨᠢᠭᠤᠷ ᠦᠭᠡᠢ ᠠᠮᠢᠲᠠᠨ᠂ ᠶᠠᠭᠤ ᠭᠡᠵᠦ ᠪᠣᠵᠠᠷ ᠬᠣᠩᠰᠢᠶᠠᠷ ᠢᠶᠡᠷ ᠢᠶᠡᠨ ᠮᠢᠨᠦ ᠡᠨᠳᠡᠬᠢ ᠠᠷᠢᠭᠤᠨ ᠤᠮᠳᠠᠭᠠᠨ ᠢ ᠰᠢᠪᠠᠷ ᠱᠠᠪᠠᠬᠠᠢ ᠪᠡᠷ ᠪᠣᠯᠠᠩᠬᠢᠷᠲᠤᠭᠤᠯᠪᠠ᠂ ᠴᠢᠨᠦ ᠡᠨᠡ ᠬᠦ ᠬᠡᠷᠴᠡᠭᠡᠢ ᠪᠠᠯᠠᠮᠠᠳ ᠠᠵᠢᠯᠯᠠᠭᠠᠨ ᠤ ᠬᠠᠷᠢᠭᠤ ᠳ᠋ᠤ ᠪᠢ ᠪᠠᠭᠠᠯᠵᠠᠭᠤᠷ ᠢ ᠴᠢᠨᠢ ᠲᠠᠰᠤ ᠬᠠᠵᠠᠨ᠎ᠠ》 ᠭᠡᠵᠦ ᠵᠠᠩᠳᠤᠷᠤᠨ ᠬᠡᠯᠡᠪᠡ᠃"
-                "<br>"
-                "ᠶᠠᠮᠠᠷ ᠨᠢᠭᠡᠨ ᠶᠠᠪᠤᠳᠠᠯ ᠢ ᠳᠠᠭᠤᠷᠢᠶᠠᠨ ᠰᠤᠷᠬᠤ ᠳ᠋ᠤ ᠪᠠᠨ ᠤᠶᠤᠨ ᠤᠬᠠᠭᠠᠨ  ᠢᠶᠡᠨ ᠬᠡᠷᠭ᠍ᠯᠡᠪᠡᠯ ᠠᠰᠢᠭ ᠲᠤᠰᠠ ᠣᠯᠵᠤ ᠴᠢᠳᠠᠨ᠎ᠠ᠂ ᠬᠡᠷᠪᠡ ᠰᠣᠬᠣᠷ ᠪᠠᠯᠠᠢ ᠪᠡᠷ ᠳᠠᠭᠤᠷᠢᠶᠠᠨ ᠰᠤᠷᠪᠠᠯ᠂ ᠪᠣᠷᠬᠠᠨ ᠡ᠂ ᠶᠠᠮᠠᠷ ᠴᠦ ᠤᠴᠠᠷᠠᠵᠤ ᠮᠡᠳᠡᠨ᠎ᠡ ᠰᠢᠦ! ᠪᠢ ᠡᠨᠡ ᠲᠠᠯ᠎ᠠ ᠪᠡᠷ ᠠᠯᠤᠰ ᠣᠷᠣᠨ ᠳ᠋ᠤ ᠪᠣᠯᠣᠭᠰᠠᠨ ᠨᠢᠭᠡᠨ ᠶᠠᠪᠤᠳᠠᠯ ᠢᠶᠡᠨ ᠵᠢᠱᠢᠶ᠎ᠡ ᠲᠠᠲᠠᠵᠤ ᠶᠠᠷᠢᠶ᠎ᠠ᠃ ᠰᠠᠷᠮᠠᠭᠴᠢᠨ ᠢ ᠣᠯᠵᠤ ᠦᠵᠡᠭ᠍ᠰᠡᠨ ᠬᠦᠮᠦᠨ ᠪᠦᠬᠦᠨ ᠲᠡᠳᠡᠨ ᠤ ᠬᠦᠮᠦᠨ ᠳᠠᠭᠤᠷᠢᠶᠠᠬᠤ ᠵᠠᠩᠲᠠᠢ ᠶᠢ ᠮᠡᠳᠡᠨ᠎ᠡ᠃ ᠠᠹᠠᠷᠢᠺᠠ ᠲᠢᠪ ᠤᠨ ᠥᠳᠬᠡᠨ ᠤᠢ ᠰᠢᠭᠤᠢ ᠳᠣᠲᠣᠷ᠎ᠠ᠂ ᠮᠣᠳᠣᠨ ᠤ ᠰᠠᠯᠠᠭ᠎ᠠ ᠮᠦᠴᠢᠷ ᠳᠡᠭᠡᠭᠦᠷ ᠰᠦᠷᠥᠭ᠌ ᠰᠠᠷᠮᠠᠭᠴᠢᠨ ᠰᠠᠭᠤᠵᠠᠭᠠᠵᠤ ᠪᠠᠢᠵᠠᠢ᠃ ᠲᠡᠳᠡ ᠳᠣᠷᠣᠭᠰᠢ ᠬᠠᠷᠠᠵᠤ ᠦᠵᠡᠲᠡᠯ᠎ᠡ᠂ ᠰᠠᠷᠮᠠᠭᠴᠢᠨ ᠪᠠᠷᠢᠬᠤ ᠬᠦᠮᠦᠨ᠂ ᠡᠪᠡᠰᠦ ᠨᠣᠭᠣᠭᠠᠨ ᠳᠡᠭᠡᠷ᠎ᠠ ᠲᠣᠣᠷ ᠳᠡᠯᠭᠡᠵᠦ᠂ ᠳᠡᠭᠡᠭᠦᠷ ᠨᠢ ᠥᠩᠭᠥᠷᠢᠨ ᠬᠦᠷᠪᠡᠵᠦ ᠪᠠᠢᠯ᠎ᠠ᠃ ᠲᠡᠭᠡᠭᠡᠳ ᠲᠡᠳᠡ ᠪᠡᠶ᠎ᠡ ᠪᠡᠶ᠎...")
+          :content ""
           :selection nil
-          :on-change-fn #(if (= % "user")
+          :on-change-fn #(if (= % "api")
                            (do
-                             (println (str "text changed: " %2))
-                             (let [quill @(subscribe [:quill])]
-                               (js/console.log "xxxxxx")
-                               (js/console.log (.getSelection quill)))))}]]]))
+                             (if (= "input" @input-type)
+                               (reset! editor-content (subs %2 3 (- (count %2) 4)))
+                               (reset! editor-content %2))
+                             (println (str "text changed: " %2))))}]]
+       [keyboard/index "input"]
+       [candidate/view]]))
