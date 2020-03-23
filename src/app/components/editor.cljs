@@ -104,7 +104,7 @@
 
       (.setContents @quill-editor [] {})))
 
-  (defn index []
+  (defn index [id]
     (fn []
       [:div {:style {:display "flex" :flex-direction "row"}}
        [:div.van-hairline--top-bottom.van-nav-bar--fixed.van-nav-bar
@@ -115,14 +115,13 @@
           :on-click #(hide-editor)}
          [:i.van-icon.van-icon-arrow-left.van-nav-bar__arrow]]
         [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} ""]]
-       ; [navbar/index]
        [:div {:style {:height "100%"
                       :margin "46px 0 0 0"
                       :padding ".7rem"
                       :overflow-y "hidden"
                       :width "100vw"}}
         [editor
-         {:id "my-editor-id"
+         {:id id
           :content ""
           :selection nil
           :on-change-fn #(if (= % "api")

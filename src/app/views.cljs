@@ -29,7 +29,7 @@
     :article-show     [article-show/index]
     :article-list     [article-list/index]
     :article-search   [article-search/index]
-    ; [editor/index]))
+    ; [editor/index "my-editor-id"]))
     [article-list/index]))
 
 (defn app []

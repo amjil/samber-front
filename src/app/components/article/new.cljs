@@ -58,7 +58,7 @@
     (fn []
       [:div
        [:div {:style {:display (if @is-editor "block" "none")}}
-        [editor/index]]
+        [editor/index "my-editor-id"]]
        [:div {:style {:display (if @is-editor "none" "flex") :flex-direction "column"
                       :width "100%"}}
         [:div.van-hairline--bottom.van-nav-bar--fixed.van-nav-bar
