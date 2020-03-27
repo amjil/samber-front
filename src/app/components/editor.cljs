@@ -47,13 +47,14 @@
             (.setSelection @quill-editor (first selection) (second selection) "api"))
 
           (let [ql-clipboard (js/document.querySelector ".ql-clipboard")]
-            (aset (.-style ql-clipboard) "visibility" "hidden"))
+            ; (aset (.-style ql-clipboard) "visibility" "hidden")
+            (aset (.-style ql-clipboard) "display" "none"))
 
           (let [ql-editor (js/document.querySelector ".ql-editor")]
             (long-tap/index ql-editor quill-editor)
             (aset (.-style ql-editor) "white-space" "pre-wrap"))
 
-          (let [my-editor (js/document.getElementById "quill-editor-my-editor-id")]
+          (let [my-editor (js/document.getElementById (str "quill-editor-" id))]
             (range-selection/create-range quill-editor my-editor 1)
             (range-selection/create-range quill-editor my-editor 2)
             (context-menu/create-element my-editor))

@@ -9,6 +9,7 @@
             [app.components.editor :as editor]
             [app.components.hammer :as hammer]
             [app.components.keyboard.keyboard :as keyboard]
+            [app.components.textbox :as textbox]
             [app.components.article.list :as article-list]
             [app.components.article.new :as article-new]
             [app.components.article.show :as article-show]
@@ -29,6 +30,7 @@
     :article-show     [article-show/index]
     :article-list     [article-list/index]
     :article-search   [article-search/index]
+    ; [textbox/index]))
     ; [editor/index "my-editor-id"]))
     [article-list/index]))
 
