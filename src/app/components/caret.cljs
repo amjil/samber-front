@@ -95,20 +95,22 @@
         top-index (if flag (.-bottom bound) (.-top bound))
         [left top]
         (if (<= top-index 0)
-          (let [[left top] (get-native-position el range)]
-            [left top])
+          [nil nil]
+          ; (let [[left top] (get-native-position el range)]
+          ;   [left top])
           [left-index top-index])]
     [left top]))
 
 (defn set-position [quill el index range]
   (let [[left top] (get-position quill el index range)]
-    (doseq [[k v] {"top" (str top "px")
-                   "left" (str left "px")}]
-      (aset (.-style el) k v))
-    (.scrollIntoView el)
-    (let [caret-display (aget (.-style el) "display")]
-      (if (and caret-display (= "none" caret-display))
-        (aset (.-style el) "display" "block")))))
+    (when-not (nil? left)
+      (doseq [[k v] {"top" (str top "px")
+                     "left" (str left "px")}]
+        (aset (.-style el) k v))
+      (.scrollIntoView el)
+      (let [caret-display (aget (.-style el) "display")]
+        (if (and caret-display (= "none" caret-display))
+          (aset (.-style el) "display" "block"))))))
 
 (defn set-range [quill selection-index]
   (let [el (js/document.getElementById "caret-position-div")

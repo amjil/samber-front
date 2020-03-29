@@ -12,16 +12,6 @@
   (:import
    [goog.async Debouncer]))
 
-(defn save-editor-content []
-  (when @quill-editor
-    (let [editor-text (clojure.string/trim (.getText @quill-editor))]
-      (when (and (some? @editor-cursor)
-                 (not-empty editor-text))
-        (if (= "input" @input-type)
-          (reset! @editor-cursor {:content editor-text :delta (.getContents @quill-editor)})
-          (let [qcontent (aget @quill-editor "container" "firstChild" "innerHTML")]
-            (reset! @editor-cursor {:content qcontent :delta (.getContents @quill-editor)})))))))
-
 (defn change-editor-field [content type]
   (when @quill-editor
     ; (.setContents @quill-editor [] {})
@@ -34,19 +24,8 @@
 
     (js/console.log "..............")
     (js/console.log (clj->js @content))
-
-    (.dangerouslyPasteHTML (.-clipboard @quill-editor) 0 (:content @content))
-
-    ; (if (:delta @content)
-    ;   (.setContents @quill-editor (.-ops (:delta @content)) {})
-    ;   (if (some? (:content @content))
-    ;     ;; set the initial content when update
-    ;     (let [clipboard (.-clipboard @quill-editor)]
-    ;       (.setContents @quill-editor [] {})
-    ;       (.dangerouslyPasteHTML clipboard 0 (:content @content)))
-    ;     (.setContents @quill-editor [] {})))
-      ;;
-      ; (.setContents @quill-editor [] {}))
+    (when (and (empty? (clojure.string/trim (.getText @quill-editor))) (some? (:content @content)))
+      (.dangerouslyPasteHTML (.-clipboard @quill-editor) 0 (:content @content)))
 
     (.setSelection @quill-editor (.getLength @quill-editor))))
 ;
@@ -109,14 +88,15 @@
            ;  [:span "ᠭᠠᠷᠴᠠᠭ"]]
            [:div.van-cell__value.van-field__value
             {:on-click #(do
-                          (reset! current "title")
-                          (reset! is-editor true)
-                          ; (change-editor-field title "input")
-                          (save-editor-content)
-                          (.fire title-field-fn)
-                          (.fire set-caret-fn))}
+                          (when-not (and @is-editor (= "title" @current))
+                            (reset! current "title")
+                            (reset! is-editor true)
+                            (.fire title-field-fn)
+                            (.fire set-caret-fn))
+                          (when (and @is-editor (= "title" @current))
+                            (set-caret)))}
             [:div.van-field__body
-             [:span
+             [:div
               (if (and @is-editor (= "title" @current))
                 [editor/editor
                  {:id "my-editor-title"
@@ -125,8 +105,8 @@
                   :on-change-fn #(if (= % "api")
                                    (do
                                      (if (= "input" @input-type)
-                                       (reset! editor-content (subs %2 3 (- (count %2) 4)))
-                                       (reset! editor-content %2))
+                                       (reset! title {:content (subs %2 3 (- (count %2) 4))})
+                                       (reset! title {:content %2}))
                                      (println (str "text changed: " %2))))}]
                 (if (empty? (:content @title))
                   "ᠭᠠᠷᠴᠠᠭ"
@@ -136,12 +116,13 @@
            ;  [:span "ᠠᠭᠤᠯᠭ᠎ᠠ"]]
            [:div.van-cell__value.van-field__value
             {:on-click #(do
-                          (reset! current "content")
-                          (reset! is-editor true)
-                          ; (change-editor-field content "textarea")
-                          (save-editor-content)
-                          (.fire content-field-fn)
-                          (.fire set-caret-fn))}
+                          (when-not (and @is-editor (= "content" @current))
+                            (reset! current "content")
+                            (reset! is-editor true)
+                            (.fire content-field-fn)
+                            (.fire set-caret-fn))
+                          (when (and @is-editor (= "title" @current))
+                            (set-caret)))}
             [:div.van-field__body {:style {;:width "calc(100vw - 7rem)"
                                            :overflow "auto"}}
              (if (and @is-editor (= "content" @current))
@@ -155,8 +136,8 @@
                   :on-change-fn #(if (= % "api")
                                    (do
                                      (if (= "input" @input-type)
-                                       (reset! editor-content (subs %2 3 (- (count %2) 4)))
-                                       (reset! editor-content %2))
+                                       (reset! content {:content (subs %2 3 (- (count %2) 4))})
+                                       (reset! content {:content %2}))
                                      (println (str "text changed: " %2))))}]]
                [:div
                 {:style {:width "9rem" :height "100%" :text-align "left"
