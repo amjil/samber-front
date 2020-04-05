@@ -89,7 +89,7 @@
 
                           :height "100%"
                           :position "relative"
-                          :padding-top "1px"
+                          ; :padding-top "1px"
                           ; :overflow "auto"
                           :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))

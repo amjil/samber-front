@@ -97,7 +97,7 @@
         (if (<= top-index 0)
           [nil nil]
           ; (let [[left top] (get-native-position el range)]
-          ;   [left top])
+            ; [left top]
           [left-index top-index])]
     [left top]))
 

@@ -25,15 +25,23 @@
     (js/console.log "..............")
     (js/console.log (clj->js @content))
     (when (and (empty? (clojure.string/trim (.getText @quill-editor))) (some? (:content @content)))
+      (js/console.log "set content")
       (.dangerouslyPasteHTML (.-clipboard @quill-editor) 0 (:content @content)))
 
     (.setSelection @quill-editor (.getLength @quill-editor))))
 ;
 (defn set-caret []
-  (let [editor-range (.getSelection @quill-editor)]
-    (if editor-range
-      (caret/set-range quill-editor (.-index editor-range))
-      (caret/set-range quill-editor 0))))
+  (if (empty? (clojure.string/trim (.getText @quill-editor)))
+    (let [el (js/document.getElementById "caret-position-div")]
+      (when el
+        (aset (.-style el) "top" "0")
+        (aset (.-style el) "left" "0")
+        (aset (.-style el) "display" "block")
+        (.scrollIntoView el)))
+    (let [editor-range (.getSelection @quill-editor)]
+      (if editor-range
+        (caret/set-range quill-editor (.-index editor-range))
+        (caret/set-range quill-editor 0)))))
 
 (defn new-article [title content]
   (let [article @(subscribe [:article])
