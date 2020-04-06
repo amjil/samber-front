@@ -20,7 +20,6 @@
     (reset! cand-list [])
     (reset! filter-prefix "")
     (reset! editor-cursor content)
-    (reset! is-editor true)
 
     (js/console.log "..............")
     (js/console.log (clj->js @content))
@@ -42,6 +41,16 @@
         (if editor-range
           (caret/set-range quill-editor (.-index editor-range))
           (caret/set-range quill-editor 0))))))
+
+(defn click-fn [is-editor current field-name field-fn caret-fn]
+  (reset! is-editor true)
+  (when-not (and @is-editor (= field-name @current))
+    (reset! current field-name)
+    (.fire field-fn)
+    (.fire caret-fn))
+  (when (and @is-editor (= field-name @current))
+    (set-caret)))
+
 
 (defn new-article [title content]
   (let [article @(subscribe [:article])
@@ -93,13 +102,7 @@
            ; [:div.van-cell__title.van-field__label
            ;  [:span "ᠭᠠᠷᠴᠠᠭ"]]
            [:div.van-cell__value.van-field__value
-            {:on-click #(do
-                          (when-not (and @is-editor (= "title" @current))
-                            (reset! current "title")
-                            (.fire title-field-fn)
-                            (.fire set-caret-fn))
-                          (when (and @is-editor (= "title" @current))
-                            (set-caret)))}
+            {:on-click #(click-fn is-editor current "title" title-field-fn set-caret-fn)}
             [:div.van-field__body
              [:div
               (if (and @is-editor (= "title" @current))
@@ -115,13 +118,7 @@
            ; [:div.van-cell__title.van-field__label
            ;  [:span "ᠠᠭᠤᠯᠭ᠎ᠠ"]]
            [:div.van-cell__value.van-field__value
-            {:on-click #(do
-                          (when-not (and @is-editor (= "content" @current))
-                            (reset! current "content")
-                            (.fire content-field-fn)
-                            (.fire set-caret-fn))
-                          (when (and @is-editor (= "title" @current))
-                            (set-caret)))}
+            {:on-click #(click-fn is-editor current "content" content-field-fn set-caret-fn)}
             [:div.van-field__body {:style {;:width "calc(100vw - 7rem)"
                                            :overflow "auto"}}
              (if (and @is-editor (= "content" @current))
@@ -132,7 +129,7 @@
                  {:id "my-editor-content"
                   :content ""
                   :selection nil
-                  :on-change-fn #(editor/on-change-fn content % %2)}]] 
+                  :on-change-fn #(editor/on-change-fn content % %2)}]]
                [:div
                 {:style {:width "9rem" :height "100%" :text-align "left"
                          :white-space "pre-wrap" :line-height "1rem"}
