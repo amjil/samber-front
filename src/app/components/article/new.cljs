@@ -14,34 +14,34 @@
 
 (defn change-editor-field [content type]
   (when @quill-editor
-    ; (.setContents @quill-editor [] {})
 
     (reset! input-type type)
     (reset! key-list [])
     (reset! cand-list [])
     (reset! filter-prefix "")
     (reset! editor-cursor content)
+    (reset! is-editor true)
 
     (js/console.log "..............")
     (js/console.log (clj->js @content))
     (when (and (empty? (clojure.string/trim (.getText @quill-editor))) (some? (:content @content)))
-      (js/console.log "set content")
       (.dangerouslyPasteHTML (.-clipboard @quill-editor) 0 (:content @content)))
 
     (.setSelection @quill-editor (.getLength @quill-editor))))
-;
+
 (defn set-caret []
-  (if (empty? (clojure.string/trim (.getText @quill-editor)))
-    (let [el (js/document.getElementById "caret-position-div")]
-      (when el
-        (aset (.-style el) "top" "0")
-        (aset (.-style el) "left" "0")
-        (aset (.-style el) "display" "block")
-        (.scrollIntoView el)))
-    (let [editor-range (.getSelection @quill-editor)]
-      (if editor-range
-        (caret/set-range quill-editor (.-index editor-range))
-        (caret/set-range quill-editor 0)))))
+  (when @quill-editor
+    (if (empty? (clojure.string/trim (.getText @quill-editor)))
+      (let [el (js/document.getElementById "caret-position-div")]
+        (when el
+          (aset (.-style el) "top" "0")
+          (aset (.-style el) "left" "0")
+          (aset (.-style el) "display" "block")
+          (.scrollIntoView el)))
+      (let [editor-range (.getSelection @quill-editor)]
+        (if editor-range
+          (caret/set-range quill-editor (.-index editor-range))
+          (caret/set-range quill-editor 0))))))
 
 (defn new-article [title content]
   (let [article @(subscribe [:article])
@@ -49,13 +49,11 @@
     (if article
       (dispatch [:article-update (assoc data :id (:id article))])
       (dispatch [:article-create data]))))
-      ; (js/console.log "article update ....")
-      ; (js/console.log "article create ...."))))
 
 (defn index []
   (let [title (r/atom {})
         content (r/atom {})
-        set-caret-fn (Debouncer. set-caret 400)
+        set-caret-fn (Debouncer. set-caret 200)
         article @(subscribe [:article])
         current (r/atom "")
         title-field-fn (Debouncer. #(change-editor-field title "input") 100)
@@ -98,7 +96,6 @@
             {:on-click #(do
                           (when-not (and @is-editor (= "title" @current))
                             (reset! current "title")
-                            (reset! is-editor true)
                             (.fire title-field-fn)
                             (.fire set-caret-fn))
                           (when (and @is-editor (= "title" @current))
@@ -110,12 +107,7 @@
                  {:id "my-editor-title"
                   :content ""
                   :selection nil
-                  :on-change-fn #(if (= % "api")
-                                   (do
-                                     (if (= "input" @input-type)
-                                       (reset! title {:content (subs %2 3 (- (count %2) 4))})
-                                       (reset! title {:content %2}))
-                                     (println (str "text changed: " %2))))}]
+                  :on-change-fn #(editor/on-change-fn title % %2)}]
                 (if (empty? (:content @title))
                   "ᠭᠠᠷᠴᠠᠭ"
                   (:content @title)))]]]]
@@ -126,7 +118,6 @@
             {:on-click #(do
                           (when-not (and @is-editor (= "content" @current))
                             (reset! current "content")
-                            (reset! is-editor true)
                             (.fire content-field-fn)
                             (.fire set-caret-fn))
                           (when (and @is-editor (= "title" @current))
@@ -141,12 +132,7 @@
                  {:id "my-editor-content"
                   :content ""
                   :selection nil
-                  :on-change-fn #(if (= % "api")
-                                   (do
-                                     (if (= "input" @input-type)
-                                       (reset! content {:content (subs %2 3 (- (count %2) 4))})
-                                       (reset! content {:content %2}))
-                                     (println (str "text changed: " %2))))}]]
+                  :on-change-fn #(editor/on-change-fn content % %2)}]] 
                [:div
                 {:style {:width "9rem" :height "100%" :text-align "left"
                          :white-space "pre-wrap" :line-height "1rem"}

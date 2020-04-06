@@ -89,7 +89,7 @@
 
                           :height "100%"
                           :position "relative"
-                          ; :padding-top "1px"
+                          :padding-top "1px"
                           ; :overflow "auto"
                           :-webkit-touch-callout "none"}
                   :dangerouslySetInnerHTML {:__html content}}]])})))
@@ -104,6 +104,14 @@
             (reset! @editor-cursor {:content content :delta (.getContents @quill-editor)}))))
 
       (.setContents @quill-editor [] {})))
+
+  (defn on-change-fn [content-atom x y]
+    (if (= x "api")
+      (do
+        (if (= "input" @input-type)
+          (reset! content-atom {:content (subs y 3 (- (count y) 4))})
+          (reset! content-atom {:content y}))
+        (println (str "text changed: " y)))))
 
   (defn index [id]
     (fn []

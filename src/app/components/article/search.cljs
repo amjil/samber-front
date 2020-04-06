@@ -12,7 +12,8 @@
 (defn index []
   (let [content (r/atom {:search-fn (fn [x] (dispatch [:article-search x])
                                             (js/console.log "search-fn ...." x))})
-        set-caret-fn (Debouncer. arnew/set-caret 100)]
+        set-caret-fn (Debouncer. arnew/set-caret 100)
+        field-fn (Debouncer. #(arnew/change-editor-field content "input") 100)]
     (fn []
       (let [searchs @(subscribe [:search])]
         [:div
@@ -38,6 +39,7 @@
                 {:on-click #(do
                               (arnew/change-editor-field content "search")
                               (js/console.log "into search .....")
+                              (.fire field-fn)
                               (.fire set-caret-fn))}
                 [:span
                  (if (empty? (:content @content))
