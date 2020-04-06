@@ -21,14 +21,31 @@
 (defn delete-text [range length]
   (js/console.log "delete-text " range)
   (if (pos? (.-index range))
-    (let [ops (.-ops (.deleteText @quill-editor (- (.-index range) 1) 1))]
-      (js/console.log "ops" ops)
-      (if (and (empty? ops) (pos? length))
-        (.deleteText @quill-editor (- (.-index range) 2) 1)))))
+    (let [default-len 30
+          ;;
+          start-index (max (- (.-index range) default-len) 0)
+          start-offset (min (- (.-index range) start-index) default-len)
+          start-text (.getText @quill-editor start-index start-offset)
+          last-char (last start-text)
+          new-index (loop [sum 0
+                           char-list (reverse (map char start-text))]
+                      (if (and (= -1 (compare "᠅" (first char-list)))
+                               (= 1 (compare "《" (first char-list))))
+                        (recur (inc sum) (rest char-list))
+                        sum))]
+      (if (pos? new-index)
+        (let [selected-index (-> (.-index range) (- new-index))
+              ops (.-ops (.deleteText @quill-editor selected-index new-index))]
+          (js/console.log "ops1111" ops))
+        (let [ops (.-ops (.deleteText @quill-editor (- (.-index range) 1) 1))]
+          (js/console.log "ops" ops)
+          (if (and (empty? ops) (pos? length))
+            (.deleteText @quill-editor (- (.-index range) 2) 1)))))))
 
 (defn on-delete []
   (let [range (.getSelection @quill-editor)
         length (.getLength @quill-editor)]
+    (js/console.log "on-delete ......" range)
     (if-not (empty? @key-list)
       (do
         (swap! key-list pop)
@@ -40,17 +57,12 @@
             (http/candidate query-list #(reset! cand-list %)))))
       (if-not (empty? @cand-list)
         (reset! cand-list [])
-        (if (zero? (.-length range))
-          (let [new-index (- (.-index range) 1)]
-            (js/console.log (.getContents @quill-editor))
-            (delete-text range length)
-            (js/console.log (.getContents @quill-editor))
-            ; (.setSelection @quill-editor new-index 0)
-            (caret/set-range quill-editor (.-index (.getSelection @quill-editor))))
-          (do
-            (.deleteText @quill-editor (.-index range) (.-length range))
-            (range-selection/hide-range)
-            (caret/set-range quill-editor (.-index range))))))
+        (let [new-index (- (.-index range) 1)]
+          (js/console.log (.getContents @quill-editor))
+          (delete-text range length)
+          (js/console.log (.getContents @quill-editor))
+          (caret/set-range quill-editor (.-index (.getSelection @quill-editor))))))
+
     (js/console.log "<<<<<<<<<<<< end" (.getSelection @quill-editor) (.getLength @quill-editor))))
 
 (defn on-normal-key [value]
