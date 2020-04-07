@@ -72,72 +72,65 @@
       (reset! content {:content (:content article)})
       (js/console.log "set initial .........8888888"))
     (fn []
-      ; [:div]
-       ; [:div {:style {:display (if @is-editor "block" "none")}}
-       ;  [editor/index "my-editor-id"]]
-       ; [:div {:style {:display (if @is-editor "none" "flex") :flex-direction "column"}}]
-
       [:div {:style {:display "flex" :flex-direction "row"}}
-       ; [:div {:style {:display "flex" :flex-direction "column"
-       ;                :width "100%"}}
-        [:div.van-hairline--bottom.van-nav-bar--fixed.van-nav-bar
-         {:style {:width "100vw"
-                  :overflow "hidden"}}
-         [:div.van-nav-bar__left
-          {:style {:height "100%"}
-           :on-click #(dispatch [:set-active-page :article-list])}
-          [:i.van-icon.van-icon-arrow-left.van-nav-bar__arrow]]
-         [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} ""]
-         [:div.van-nav-bar__right
-          {:style {:height "100%" :right "0"}
-           :on-click #(new-article title content)}
-          [:i.van-icon.van-icon-success]]]
-        [:div {:style {:margin "46px 0 0 0"
-                       :height "100%"}}
-         [:div.van-cell-group.van-hairline--top-bottom
-          [:div.van-cell
-           [:div.van-cell__title
-            [:span "ᠰᠢᠨ᠎ᠡ ᠨᠡᠢᠲᠡᠯᠡᠯ"]]]
-          [:div.van-cell.van-field
-           ; [:div.van-cell__title.van-field__label
-           ;  [:span "ᠭᠠᠷᠴᠠᠭ"]]
-           [:div.van-cell__value.van-field__value
-            {:on-click #(click-fn is-editor current "title" title-field-fn set-caret-fn)}
-            [:div.van-field__body
-             [:div
-              (if (and @is-editor (= "title" @current))
-                [editor/editor
-                 {:id "my-editor-title"
-                  :content ""
-                  :selection nil
-                  :on-change-fn #(editor/on-change-fn title % %2)}]
-                (if (empty? (:content @title))
-                  "ᠭᠠᠷᠴᠠᠭ"
-                  (:content @title)))]]]]
-          [:div.van-cell.van-field
-           ; [:div.van-cell__title.van-field__label
-           ;  [:span "ᠠᠭᠤᠯᠭ᠎ᠠ"]]
-           [:div.van-cell__value.van-field__value
-            {:on-click #(click-fn is-editor current "content" content-field-fn set-caret-fn)}
-            [:div.van-field__body {:style {;:width "calc(100vw - 7rem)"
-                                           :overflow "auto"}}
-             (if (and @is-editor (= "content" @current))
-               [:div
-                {:style {:width "9rem" :height "100%" :text-align "left"
-                         :white-space "pre-wrap" :line-height "1rem"}}
-                [editor/editor
-                 {:id "my-editor-content"
-                  :content ""
-                  :selection nil
-                  :on-change-fn #(editor/on-change-fn content % %2)}]]
-               [:div
-                {:style {:width "9rem" :height "100%" :text-align "left"
-                         :white-space "pre-wrap" :line-height "1rem"}
-                 :dangerouslySetInnerHTML {:__html (if (empty? (:content @content))
-                                                     "ᠠᠭᠤᠯᠭ᠎ᠠ"
-                                                     (:content @content))}}])]]]]]
-        (if @is-editor
-          [:div
-           [candidate/view]
-           [keyboard/index "input"]]
-          [tabbar/view])])))
+       [:div.van-hairline--bottom.van-nav-bar--fixed.van-nav-bar
+        {:style {:width "100vw"
+                 :overflow "hidden"}}
+        [:div.van-nav-bar__left
+         {:style {:height "100%"}
+          :on-click #(dispatch [:set-active-page :article-list])}
+         [:i.van-icon.van-icon-arrow-left.van-nav-bar__arrow]]
+        [:div.van-nav-bar__title.van-ellipsis {:style {:height "100%"}} ""]
+        [:div.van-nav-bar__right
+         {:style {:height "100%" :right "0"}
+          :on-click #(new-article title content)}
+         [:i.van-icon.van-icon-success]]]
+       [:div {:style {:margin "46px 0 0 0"
+                      :height "100%"}}
+        [:div.van-cell-group.van-hairline--top-bottom
+         [:div.van-cell
+          [:div.van-cell__title
+           [:span "ᠰᠢᠨ᠎ᠡ ᠨᠡᠢᠲᠡᠯᠡᠯ"]]]
+         [:div.van-cell.van-field
+          ; [:div.van-cell__title.van-field__label
+          ;  [:span "ᠭᠠᠷᠴᠠᠭ"]]
+          [:div.van-cell__value.van-field__value
+           {:on-click #(click-fn is-editor current "title" title-field-fn set-caret-fn)}
+           [:div.van-field__body
+            [:div
+             (if (and @is-editor (= "title" @current))
+               [editor/editor
+                {:id "my-editor-title"
+                 :content ""
+                 :selection nil
+                 :on-change-fn #(editor/on-change-fn title % %2)}]
+               (if (empty? (:content @title))
+                 "ᠭᠠᠷᠴᠠᠭ"
+                 (:content @title)))]]]]
+         [:div.van-cell.van-field
+          ; [:div.van-cell__title.van-field__label
+          ;  [:span "ᠠᠭᠤᠯᠭ᠎ᠠ"]]
+          [:div.van-cell__value.van-field__value
+           {:on-click #(click-fn is-editor current "content" content-field-fn set-caret-fn)}
+           [:div.van-field__body {:style {;:width "calc(100vw - 7rem)"
+                                          :overflow "auto"}}
+            (if (and @is-editor (= "content" @current))
+              [:div
+               {:style {:width "9rem" :height "100%" :text-align "left"
+                        :white-space "pre-wrap" :line-height "1rem"}}
+               [editor/editor
+                {:id "my-editor-content"
+                 :content ""
+                 :selection nil
+                 :on-change-fn #(editor/on-change-fn content % %2)}]]
+              [:div
+               {:style {:width "9rem" :height "100%" :text-align "left"
+                        :white-space "pre-wrap" :line-height "1rem"}
+                :dangerouslySetInnerHTML {:__html (if (empty? (:content @content))
+                                                    "ᠠᠭᠤᠯᠭ᠎ᠠ"
+                                                    (:content @content))}}])]]]]]
+       (if @is-editor
+         [:div
+          [candidate/view]
+          [keyboard/index "input"]]
+         [tabbar/view])])))
