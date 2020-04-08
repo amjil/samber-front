@@ -47,10 +47,7 @@
   (when-not (and @is-editor (= field-name @current))
     (reset! current field-name)
     (.fire field-fn)
-    (.fire caret-fn))
-  (when (and @is-editor (= field-name @current))
-    (set-caret)))
-
+    (.fire caret-fn)))
 
 (defn new-article [title content]
   (let [article @(subscribe [:article])
@@ -90,7 +87,7 @@
         [:div.van-cell-group.van-hairline--top-bottom
          [:div.van-cell
           [:div.van-cell__title
-           [:span "ᠰᠢᠨ᠎ᠡ ᠨᠡᠢᠲᠡᠯᠡᠯ"]]]
+           [:span (if article "ᠵᠠᠰᠠᠬᠤ" "ᠰᠢᠨ᠎ᠡ ᠨᠡᠢᠲᠡᠯᠡᠯ")]]]
          [:div.van-cell.van-field
           ; [:div.van-cell__title.van-field__label
           ;  [:span "ᠭᠠᠷᠴᠠᠭ"]]
