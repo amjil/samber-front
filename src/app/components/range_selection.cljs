@@ -39,7 +39,7 @@
 
 (defn set-quill-selection [quill el type selection-index q-range]
   (let [quill-range (.getSelection @quill)]
-    (js/console.log "quill range = " quill-range)
+    (js/console.log "quill range = " quill-range "type = " type)
     (if (= type 1)
       (if (>= selection-index (+ (.-index @q-range) (.-length @q-range)))
         (let [select-text (.getText @quill selection-index 30)
@@ -48,9 +48,11 @@
                           1
                           (count (first text-list)))]
           (.setSelection @quill selection-index sel-end)
-          (set-range quill (.querySelector (.-parentNode el) "#selection-end-div") (+ selection-index sel-end)))
+          (set-range quill (.querySelector (.-parentNode el) "#selection-end-div") (+ selection-index sel-end))
+          (js/console.log "11<<<<<<"))
         (do
           (.setSelection @quill selection-index (- (+ (.-index quill-range) (.-length quill-range)) selection-index))
+          (set-range quill (.querySelector (.-parentNode el) "#selection-start-div") selection-index)
           ; bug fix ( @q-range has failed use quill-range to set error range and reset use @q-range)
           (if (not= (.-length quill-range) (.-length @q-range))
             (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index)))))
@@ -61,9 +63,12 @@
                           1
                           (count (last (str/split select-text #"\s"))))]
           (.setSelection @quill (- selection-index sel-start) sel-start)
-          (set-range quill (.querySelector (.-parentNode el) "#selection-start-div") (- selection-index sel-start)))
+          (set-range quill (.querySelector (.-parentNode el) "#selection-start-div") (- selection-index sel-start))
+          (js/console.log "22<<<<<<"))
+
         (do
-          (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range))))))))
+          (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range)))
+          (set-range quill (.querySelector (.-parentNode el) "#selection-end-div") selection-index))))))
 
 
 (defn move-border [quill el q-range e type]
@@ -93,14 +98,15 @@
             left-index (-> left
                          (+ (.-scrollLeft (.-parentNode parent-el)))
                          (- (.-offsetLeft parent-el)))
-            top-index (- top (.-offsetTop parent-el))]
+            top-index (+ top (.-offsetTop parent-el))]
             ;;;
             ; quill-range (.getSelection @quill)]
             ; quill-range @q-range]
             ;;
         ; (caret/set-position (.-target e) range)
-        (aset (.-style range-el) "left" (str left-index "px"))
-        (aset (.-style range-el) "top" (str top-index "px"))
+        ; (aset (.-style range-el) "left" (str left "px"))
+        ; (aset (.-style range-el) "top" (str top "px"))
+        (js/console.log "<<<<<<<<<<" left-index "+<><>" top-index)
         (js/console.log "<<<<<<<<<<" selection-index "-<><>" start-offset)
         ; (js/console.log quill-range)
         ;;
@@ -110,7 +116,9 @@
         ;     (if (not= (.-length quill-range) (.-length @q-range))
         ;       (.setSelection @quill selection-index (- (+ (.-index @q-range) (.-length @q-range)) selection-index))))
         ;   (.setSelection @quill (.-index quill-range) (- selection-index (.-index quill-range))))
+        (js/console.log "set-quill-selection .....")
         (set-quill-selection quill range-el type selection-index q-range)
+        (js/console.log "set-quill-selection .....")
         (js/console.log (.getSelection @quill))
         (reset! q-range (.getSelection @quill))))
     ;;
@@ -177,4 +185,5 @@
           top-index (if flag (.-bottom bound) (.-top bound))]
       (js/console.log left-index " --- " top-index)
       (aset (.-style range-el) "left" (str left-index "px"))
-      (aset (.-style range-el) "top" (str top-index "px")))))
+      (aset (.-style range-el) "top" (str top-index "px"))
+      (js/console.log "in index ...... "))))
