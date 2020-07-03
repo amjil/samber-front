@@ -3,6 +3,7 @@
     ["quill" :as Quill]
     [clojure.string :as str]
     [app.components.caret :as caret]
+    [app.components.context-menu :as context-menu]
     [reagent.core :as r]))
 
 (declare index)
@@ -134,9 +135,13 @@
         touch-start (fn [e]
                       (.preventDefault e)
                       (reset! quill-range (.getSelection @quill))
+                      (let [menu-el (.querySelector (.-parentNode el) "#context-menu")]
+                        (aset (.-style menu-el) "display" "none"))
                       (js/console.log "touch-start ...."))
         touch-move (fn [e] (move-border quill el quill-range e type))
-        touch-end (fn [e] (js/console.log "touch-end ...."))
+        touch-end (fn [e]
+                    (context-menu/index el quill)
+                    (js/console.log "touch-end ...."))
         ;;
         shadow-caret (js/document.createTextNode "|")]
     ;;

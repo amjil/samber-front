@@ -6,6 +6,7 @@
     ["dayjs" :as dayjs]
     [app.components.caret :as caret]
     [app.components.range-selection :as range-selection]
+    [app.components.context-menu :as context-menu]
     [clojure.string :as str])
   (:import
    [goog.async Debouncer]))
@@ -33,13 +34,14 @@
     (reset! timer (.valueOf (dayjs)))
     (reset! is-long? true)
     (range-selection/hide ql-editor)
+    (context-menu/hide-menu ql-editor)
     (js/console.log "touch start ....")))
 
 (defn- touch-move [e is-long?]
   (reset! is-long? false)
   (js/console.log "touch move ...."))
 
-(defn- touch-end [e is-long? timer]
+(defn- touch-end [el quill e is-long? timer]
   (js/console.log "touch end ...." @is-long?)
   (reset! is-long? false))
 
@@ -77,9 +79,9 @@
         (range-selection/index el this selected-index 1)
         (range-selection/index el this (+ selected-index selected-offset) 2)
         (.setSelection @this selected-index selected-offset)
-        (let [caret-div (js/document.getElementById "caret-position-div")]
+        (context-menu/index el this)
+        (let [caret-div (.querySelector (.-parentNode el)  "#caret-position-div")]
           (aset (.-style caret-div) "display" "none"))))))
-            ; end-text (.getText @this)))))))
 
 
 (defn index [el this]
@@ -95,7 +97,7 @@
     (.addEventListener el "touchmove"
       (fn [e] (touch-move e is-long?)))
     (.addEventListener el "touchend"
-      (fn [e] (touch-end e is-long? long-press-timer)))
+      (fn [e] (touch-end el this e is-long? long-press-timer)))
     (.addEventListener el "selectionchange" (fn [e] (js/console.log "selectionchange ....")))
     (.addEventListener el "scroll" (fn [e] (js/console.log "scroll ....")))
     (.addEventListener el "contextmenu"
