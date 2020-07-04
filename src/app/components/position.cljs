@@ -2,9 +2,25 @@
   (:require
     ["quill" :as Quill]))
 
-; (defn index [])
-;
-(defn index [quill index]
+
+(defn index [el quill type]
+  (let [selection-range (.getSelection @quill)
+        index (if (= 1 type)
+                (.-index selection-range)
+                (+ (.-index selection-range) (.-length selection-range)))
+        [blot offset] (.getLeaf @quill index)
+        flag (and (= 3 (.-nodeType (.-domNode blot))) (= offset (.-length (.-domNode blot))))
+        index (if flag (- index 1) index)
+        offset (if flag 1 0)
+        ;; editor bound
+        bound (.getBounds @quill index offset)
+
+        left-index (+ (.-scrollLeft (.-parentNode el)) (.-left bound))
+        top-index (if flag (.-bottom bound) (.-top bound))]
+    (js/console.log ",<<,,,," left-index top-index)
+    [left-index top-index]))
+
+(defn index2 [quill index]
   (let [[blot offset] (.getLeaf @quill index)
         flag (and (= 3 (.-nodeType (.-domNode blot))) (= offset (.-length (.-domNode blot))))
         index (if flag (- index 1) index)
@@ -43,3 +59,15 @@
       (.remove shadow-caret)
       (js/console.log "range position" range-index)
       range-index)))
+
+;;
+;; range position
+(defn range-position [el quill type]
+  (let [id (if (= 1 type) "#selection-start-div" "#selection-end-div")
+        range-el (.querySelector el id)]
+    (if (= "none" (aget (.-style range-el) "display"))
+      (aset (.-style range-el) "display" "block"))
+    (let [[left-index top-index] (index el quill type)]
+      (aset (.-style range-el) "left" (str left-index "px"))
+      (aset (.-style range-el) "top" (str top-index "px"))
+      (js/console.log "in index ...... "))))

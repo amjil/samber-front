@@ -1,7 +1,20 @@
 (ns app.components.context-menu
   (:require
-    [reagent.core :as r]))
+    [reagent.core :as r]
+    [app.components.atom :as editor-atom]
+    [app.components.position :as position]))
 
+
+; (defmulti button-action (fn [x y] (identity x)))
+
+; (defmethod button-action :select-all [action-type el]
+(defn button-action [type el]
+  (js/console.log "button-action -- select-all")
+  (let [length (.getLength @editor-atom/quill-editor)]
+    (.setSelection @editor-atom/quill-editor 0 length)
+    (.focus @editor-atom/quill-editor)
+    (position/range-position el editor-atom/quill-editor 1)
+    (position/range-position el editor-atom/quill-editor 2)))
 
 (defn create-element [el]
   (let [
@@ -11,7 +24,7 @@
                       (js/console.log "touch-start ...."))
         touch-move (fn [e] (js/console.log "touch-move ..."))
         touch-end (fn [e] (js/console.log "touch-end ...."))
-        data ["ᠪᠦᠭᠦᠳᠡ" "ᠬᠠᠭᠤᠯᠬᠤ" "ᠨᠠᠭᠠᠬᠤ" "ᠬᠠᠰᠤᠬᠤ"]]
+        data [{:label "ᠪᠦᠭᠦᠳᠡ" :action :select-all} {:label "ᠬᠠᠭᠤᠯᠬᠤ" :action :select-all} {:label "ᠨᠠᠭᠠᠬᠤ" :action :select-all} {:label "ᠬᠠᠰᠤᠬᠤ" :action :select-all}]]
     ;;
     ; (.addEventListener div "touchstart" touch-start)
     ; (.addEventListener div "touchmove" touch-move)
@@ -20,7 +33,11 @@
     (.add (.-classList div) "context-menu")
     (doseq [x data]
       (let [ele (js/document.createElement "div")]
-        (set! (.-innerHTML ele) x)
+        (set! (.-innerHTML ele) (:label x))
+        (.addEventListener ele "touchstart"
+          (fn [e]
+            (.preventDefault e)
+            (button-action (:action x) el)))
         (.appendChild div ele)))
     (aset (.-style div) "display" "none")
     (aset (.-style div) "with" ".7rem")
@@ -33,20 +50,14 @@
 
 (defn index [el quill]
   (let [menu-el (.querySelector (.-parentNode el) "#context-menu")
-        quill-range (.getSelection @quill)
-        index (.-index quill-range)
-        [blot offset] (.getLeaf @quill index)
-        flag (and (= 3 (.-nodeType (.-domNode blot))) (= offset (.-length (.-domNode blot))))
-        _ (js/console.log " == " flag " == " (.-length (.-domNode blot)) " -- " offset)
-        index (if flag (- index 1) index)
-        offset (if flag 1 0)
-        bound (.getBounds @quill index offset)
+        [left-index top] (position/index el quill 1)
         parent-rect (.getBoundingClientRect el)
-        left-index (-> (.-left bound)
-                       (+ (.-left parent-rect)))]
-    (js/console.log bound)
-    (js/console.log (.-offsetLeft (.-parentNode (.-parentNode el))))
-    (js/console.log (.getBoundingClientRect el))
+        left-index (-> left-index
+                       (+ (.-left parent-rect))
+                       (- 20))
+        left-index (if (< left-index 10)
+                     10
+                     left-index)]
     (aset (.-style menu-el) "display" "flex")
     (aset (.-style menu-el) "left" (str left-index "px"))))
 
