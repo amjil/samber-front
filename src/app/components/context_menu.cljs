@@ -5,16 +5,31 @@
     [app.components.position :as position]))
 
 
-; (defmulti button-action (fn [x y] (identity x)))
+(defmulti button-action (fn [x y] (identity x)))
 
-; (defmethod button-action :select-all [action-type el]
-(defn button-action [type el]
+(defmethod button-action :select-all [action-type el]
   (js/console.log "button-action -- select-all")
   (let [length (.getLength @editor-atom/quill-editor)]
     (.setSelection @editor-atom/quill-editor 0 length)
     (.focus @editor-atom/quill-editor)
     (position/range-position el editor-atom/quill-editor 1)
-    (position/range-position el editor-atom/quill-editor 2)))
+    (position/range-position el editor-atom/quill-editor 2)
+    (position/context-menu-position el editor-atom/quill-editor)))
+
+(defmethod button-action :copy [_ el e]
+  (js/console.log "button-action -- copy")
+  (let [flag (js/document.execCommand "Copy")]
+    (js/console.log "copy = " flag)))
+
+(defmethod button-action :paste [_ el e]
+  (js/console.log "button-action -- paste")
+  ; (.focus @editor-atom/quill-editor)
+  (-> (.readText js/navigator.clipboard)
+    (.then #(js/console.log "aaa " %))
+    (.catch #(js/console.log %))
+    (.finally #(js/console.log "cleanup")))
+  (js/console.log "paste ......."))
+
 
 (defn create-element [el]
   (let [
@@ -24,7 +39,7 @@
                       (js/console.log "touch-start ...."))
         touch-move (fn [e] (js/console.log "touch-move ..."))
         touch-end (fn [e] (js/console.log "touch-end ...."))
-        data [{:label "ᠪᠦᠭᠦᠳᠡ" :action :select-all} {:label "ᠬᠠᠭᠤᠯᠬᠤ" :action :select-all} {:label "ᠨᠠᠭᠠᠬᠤ" :action :select-all} {:label "ᠬᠠᠰᠤᠬᠤ" :action :select-all}]]
+        data [{:label "ᠪᠦᠭᠦᠳᠡ" :action :select-all} {:label "ᠬᠠᠭᠤᠯᠬᠤ" :action :copy} {:label "ᠨᠠᠭᠠᠬᠤ" :action :paste} {:label "ᠬᠠᠰᠤᠬᠤ" :action :select-all}]]
     ;;
     ; (.addEventListener div "touchstart" touch-start)
     ; (.addEventListener div "touchmove" touch-move)
@@ -37,7 +52,7 @@
         (.addEventListener ele "touchstart"
           (fn [e]
             (.preventDefault e)
-            (button-action (:action x) el)))
+            (button-action (:action x) el e)))
         (.appendChild div ele)))
     (aset (.-style div) "display" "none")
     (aset (.-style div) "with" ".7rem")
@@ -48,7 +63,7 @@
 
     (.appendChild el div)))
 
-(defn index [el quill]
+(defn index2 [el quill]
   (let [menu-el (.querySelector (.-parentNode el) "#context-menu")
         [left-index top] (position/index el quill 1)
         parent-rect (.getBoundingClientRect el)

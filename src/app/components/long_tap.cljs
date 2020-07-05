@@ -7,6 +7,7 @@
     [app.components.caret :as caret]
     [app.components.range-selection :as range-selection]
     [app.components.context-menu :as context-menu]
+    [app.components.position :as position]
     [clojure.string :as str])
   (:import
    [goog.async Debouncer]))
@@ -79,7 +80,7 @@
         (range-selection/index el this selected-index 1)
         (range-selection/index el this (+ selected-index selected-offset) 2)
         (.setSelection @this selected-index selected-offset)
-        (context-menu/index el this)
+        (position/context-menu-position el this)
         (let [caret-div (.querySelector (.-parentNode el)  "#caret-position-div")]
           (aset (.-style caret-div) "display" "none"))))))
 

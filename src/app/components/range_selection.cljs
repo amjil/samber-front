@@ -3,7 +3,7 @@
     ["quill" :as Quill]
     [clojure.string :as str]
     [app.components.caret :as caret]
-    [app.components.context-menu :as context-menu]
+    [app.components.position :as position]
     [reagent.core :as r]))
 
 (declare index)
@@ -140,7 +140,7 @@
                       (js/console.log "touch-start ...."))
         touch-move (fn [e] (move-border quill el quill-range e type))
         touch-end (fn [e]
-                    (context-menu/index el quill)
+                    (position/context-menu-position el quill)
                     (js/console.log "touch-end ...."))
         ;;
         shadow-caret (js/document.createTextNode "|")]

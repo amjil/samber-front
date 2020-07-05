@@ -71,3 +71,17 @@
       (aset (.-style range-el) "left" (str left-index "px"))
       (aset (.-style range-el) "top" (str top-index "px"))
       (js/console.log "in index ...... "))))
+
+;; context menu position
+(defn context-menu-position [el quill]
+  (let [menu-el (.querySelector (.-parentNode el) "#context-menu")
+        [left-index top] (index el quill 1)
+        parent-rect (.getBoundingClientRect el)
+        left-index (-> left-index
+                       (+ (.-left parent-rect))
+                       (- 20))
+        left-index (if (< left-index 10)
+                     10
+                     left-index)]
+    (aset (.-style menu-el) "display" "flex")
+    (aset (.-style menu-el) "left" (str left-index "px"))))
