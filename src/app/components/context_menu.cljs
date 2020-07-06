@@ -2,8 +2,10 @@
   (:require
     [reagent.core :as r]
     [app.components.atom :as editor-atom]
-    [app.components.position :as position]))
+    [app.components.position :as position]
+    [app.components.caret :as caret]))
 
+(declare hide-menu)
 
 (defmulti button-action (fn [x y] (identity x)))
 
@@ -19,16 +21,32 @@
 (defmethod button-action :copy [_ el e]
   (js/console.log "button-action -- copy")
   (let [flag (js/document.execCommand "Copy")]
-    (js/console.log "copy = " flag)))
+    (js/console.log "copy = " flag))
+  (hide-menu el))
 
 (defmethod button-action :paste [_ el e]
   (js/console.log "button-action -- paste")
   ; (.focus @editor-atom/quill-editor)
-  (-> (.readText js/navigator.clipboard)
-    (.then #(js/console.log "aaa " %))
-    (.catch #(js/console.log %))
-    (.finally #(js/console.log "cleanup")))
-  (js/console.log "paste ......."))
+  (let [ql-range (.getSelection @editor-atom/quill-editor)]
+    (-> (.readText js/navigator.clipboard)
+      (.then #(.insertText @editor-atom/quill-editor (.-index ql-range) %))
+      (.catch #(js/console.log %))
+      (.finally #(js/console.log "cleanup"))))
+  (hide-menu el))
+
+(defmethod button-action :delete [_ el e]
+  (js/console.log "button-action -- delete")
+  (let [ql-range (.getSelection @editor-atom/quill-editor)]
+    (.deleteText @editor-atom/quill-editor (.-index ql-range) (.-length ql-range)))
+  (let [new-range (.getSelection @editor-atom/quill-editor)]
+    (caret/set-range editor-atom/quill-editor (.-index new-range)))
+  (let [el-start (.querySelector el "#selection-start-div")
+        el-end (.querySelector el "#selection-end-div")]
+    (if-not (= "none" (aget (.-style el-start) "display"))
+      (aset (.-style el-start) "display" "none"))
+    (if-not (= "none" (aget (.-style el-end) "display"))
+      (aset (.-style el-end) "display" "none")))
+  (hide-menu el))
 
 
 (defn create-element [el]
@@ -39,7 +57,7 @@
                       (js/console.log "touch-start ...."))
         touch-move (fn [e] (js/console.log "touch-move ..."))
         touch-end (fn [e] (js/console.log "touch-end ...."))
-        data [{:label "ᠪᠦᠭᠦᠳᠡ" :action :select-all} {:label "ᠬᠠᠭᠤᠯᠬᠤ" :action :copy} {:label "ᠨᠠᠭᠠᠬᠤ" :action :paste} {:label "ᠬᠠᠰᠤᠬᠤ" :action :select-all}]]
+        data [{:label "ᠪᠦᠭᠦᠳᠡ" :action :select-all} {:label "ᠬᠠᠭᠤᠯᠬᠤ" :action :copy} {:label "ᠨᠠᠭᠠᠬᠤ" :action :paste} {:label "ᠬᠠᠰᠤᠬᠤ" :action :delete}]]
     ;;
     ; (.addEventListener div "touchstart" touch-start)
     ; (.addEventListener div "touchmove" touch-move)
