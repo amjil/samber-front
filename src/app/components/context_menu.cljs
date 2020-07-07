@@ -5,7 +5,7 @@
     [app.components.position :as position]
     [app.components.caret :as caret]))
 
-(declare hide-menu)
+(declare hide-menu hide-selection-range)
 
 (defmulti button-action (fn [x y] (identity x)))
 
@@ -22,6 +22,12 @@
   (js/console.log "button-action -- copy")
   (let [flag (js/document.execCommand "Copy")]
     (js/console.log "copy = " flag))
+  (.focus @editor-atom/quill-editor)
+  (let [range (.getSelection @editor-atom/quill-editor)]
+    (.setSelection @editor-atom/quill-editor (+ (.-index range) (.-length range)) 0))
+  (let [new-range (.getSelection @editor-atom/quill-editor)]
+    (caret/set-range editor-atom/quill-editor (.-index new-range)))
+  (hide-selection-range el)
   (hide-menu el))
 
 (defmethod button-action :paste [_ el e]
@@ -32,6 +38,9 @@
       (.then #(.insertText @editor-atom/quill-editor (.-index ql-range) %))
       (.catch #(js/console.log %))
       (.finally #(js/console.log "cleanup"))))
+  (let [new-range (.getSelection @editor-atom/quill-editor)]
+    (caret/set-range editor-atom/quill-editor (.-index new-range)))
+  (hide-selection-range el)
   (hide-menu el))
 
 (defmethod button-action :delete [_ el e]
@@ -40,12 +49,7 @@
     (.deleteText @editor-atom/quill-editor (.-index ql-range) (.-length ql-range)))
   (let [new-range (.getSelection @editor-atom/quill-editor)]
     (caret/set-range editor-atom/quill-editor (.-index new-range)))
-  (let [el-start (.querySelector el "#selection-start-div")
-        el-end (.querySelector el "#selection-end-div")]
-    (if-not (= "none" (aget (.-style el-start) "display"))
-      (aset (.-style el-start) "display" "none"))
-    (if-not (= "none" (aget (.-style el-end) "display"))
-      (aset (.-style el-end) "display" "none")))
+  (hide-selection-range el)
   (hide-menu el))
 
 
@@ -99,3 +103,11 @@
   (let [menu-el (.querySelector (.-parentNode el) "#context-menu")]
     (if-not (= "none" (aget (.-style menu-el) "display"))
       (aset (.-style menu-el) "display" "none"))))
+
+(defn hide-selection-range [el]
+  (let [el-start (.querySelector el "#selection-start-div")
+        el-end (.querySelector el "#selection-end-div")]
+    (if-not (= "none" (aget (.-style el-start) "display"))
+      (aset (.-style el-start) "display" "none"))
+    (if-not (= "none" (aget (.-style el-end) "display"))
+      (aset (.-style el-end) "display" "none"))))
