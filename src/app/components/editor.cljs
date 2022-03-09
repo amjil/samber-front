@@ -1,19 +1,18 @@
   (ns app.components.editor
     (:require
      [reagent.core :as r]
+     [reagent.dom :as rd]
      ["quill" :as quill]
      [app.components.atom :refer [editor-cursor editor-content quill-editor keyboard-layout input-type is-editor]]
      [re-frame.core :refer [subscribe dispatch]]
      [app.components.tabbar :as tabbar]
      [app.components.navbar :as navbar]
-     [app.components.quill :as qeditor]
      [app.components.caret :as caret]
      [app.components.long-tap :as long-tap]
      [app.components.range-selection :as range-selection]
      [app.components.context-menu :as context-menu]
      [app.components.keyboard.keyboard :as keyboard]
      [app.components.keyboard.candidate :as candidate]
-     ["react-hammerjs" :default Hammer]
      ["dayjs" :as dayjs])
     (:import
      [goog.async Debouncer]))
@@ -29,11 +28,11 @@
         (fn [component]
           (reset! quill-editor
                   (quill.
-                   (aget (.-children (r/dom-node component)) 0)
+                   (aget (.-children (rd/dom-node component)) 0)
                    #js {
                         :modules #js {:toolbar false}
                         :theme "snow"
-                        :readOnly true
+                        ; :readOnly true
                         ; :debug "info"
                         :placeholder "ᠠᠭᠤᠯᠭ᠎ᠠ ᠪᠠᠨ ᠨᠠᠢᠷᠠᠭᠤᠯᠤᠶ᠎ᠠ ..."}))
 

@@ -4,7 +4,6 @@
             [cljs-http.client :as http]
             [clojure.string :as str]))
 
-
 (def base-url "http://localhost:3002/api/v1")
 
 (defn url [s] (str base-url s))

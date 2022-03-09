@@ -1,8 +1,10 @@
 (ns app.components.quill
   (:require
    [reagent.core :as r]
+   [reagent.dom :as rd]
    ["quill" :as quill]
-   [re-frame.core :refer [subscribe dispatch]]))
+   [re-frame.core :refer [subscribe dispatch]]
+   [cljs-bean.core :as bean]))
 
 
 (defn quill-toolbar [id]
@@ -66,10 +68,10 @@
       (fn [component]
         (reset! this
                 (quill.
-                 (aget (.-children (r/dom-node component)) 1)
-                 #js {:modules #js {:toolbar (aget (.-children (r/dom-node component)) 0)}
+                 (aget (.-children (rd/dom-node component)) 1)
+                 #js {:modules #js {:toolbar (aget (.-children (rd/dom-node component)) 0)}
                       :theme "snow"
-                      :readOnly true
+                      ; :readOnly true
                       :placeholder "11Compose an epic..."}))
 
         (.on @this "text-change"

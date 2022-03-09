@@ -7,7 +7,6 @@
             [app.components.home :as home]
             [app.components.login :as login]
             [app.components.editor :as editor]
-            [app.components.hammer :as hammer]
             [app.components.keyboard.keyboard :as keyboard]
             [app.components.article.list :as article-list]
             [app.components.article.new :as article-new]

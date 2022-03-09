@@ -7,7 +7,7 @@
                                                          (dispatch [:set-active-page :home])
                                                          (js/console.log "item 1"))}
               {:id 2 :name "" :icon "search" :on-click (fn []
-                                                         (dispatch [:set-active-page :editor])
+                                                         (dispatch [:set-active-page :quill])
                                                          (js/console.log "item 2"))}
               {:id 3 :name "" :icon "friends-o" :on-click #(js/console.log "item 3")}
               {:id 4 :name "" :icon "setting-o" :on-click #(js/console.log "item 4")}]
